@@ -166,6 +166,15 @@ export default function Login() {
 						{t('goBack')}
 					</Button>
 				)}
+				{!showFullForm && (
+					<Button
+						colorScheme='gray'
+						onClick={() => navigate('/inventory')}
+						mt={2}
+					>
+						{t('fillInInventory')}
+					</Button>
+				)}
 			</Flex>
 			<Image
 				src='/favicon.svg'

@@ -20,6 +20,7 @@ import { BsMailbox } from "react-icons/bs";
 import { palette } from '../theme';
 import { API_URL } from './specific';
 import { computeInsights } from './stats';
+import Inventory from '../pages/Inventory';
 
 export const user = JSON.parse(localStorage.getItem('user'));
 
@@ -296,6 +297,13 @@ export const getRoutes = () => [
 		path: '/insights/:id',
 		component: PublicInsights,
 		title: i18n.t('insights'),
+		public: true,
+		worksWithoutBoxes: true,
+	},
+	{
+		path: '/inventory',
+		component: Inventory,
+		title: i18n.t('Inventory'),
 		public: true,
 		worksWithoutBoxes: true,
 	},

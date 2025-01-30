@@ -8,6 +8,7 @@ import boxesController from './controllers/boxes.ctrl.js';
 import scansController from './controllers/scans.ctrl.js';
 import authController from './controllers/auth.ctrl.js';
 import insightsController from './controllers/insights.ctrl.js';
+import inventoryController from './controllers/inventory.ctrl.js';
 
 dotenv.config();
 
@@ -56,6 +57,7 @@ app.use('/api/boxes', boxesController);
 app.use('/api/scan', scansController);
 app.use('/api/auth', authController);
 app.use('/api/insights', insightsController);
+app.use('/api/inventory', inventoryController);
 
 app.listen(apiPort, () => console.info(`Server running on port ${apiPort}`));
 
