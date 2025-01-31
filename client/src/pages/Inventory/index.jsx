@@ -226,7 +226,6 @@ export default function Inventory() {
                             <NumberInput
                                 defaultValue={0}
                                 min={0}
-                                max={100}
                                 width='fit-content'
                             >
                                 <NumberInputField />
