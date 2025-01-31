@@ -25,7 +25,7 @@ export default function Inventory() {
     const [items, setItems] = useState([]);
     const { t } = useTranslation();
 
-    const enrolment = ['Std 1', 'Std 2', 'Std 3'];
+    const enrolment = ['Grade 1', 'Grade 2', 'Grade 3'];
 
     const fetchBoxes = () => {
         callAPI('GET', `inventory/boxes/${phone}`)
@@ -55,6 +55,11 @@ export default function Inventory() {
                 console.error(e);
             });
     }
+
+    useEffect(() => {
+        if (searchParams.get('phone'))
+            setPhone(searchParams.get('phone'));
+    }, [searchParams]);
 
     useEffect(() => {
         if (phone) {
