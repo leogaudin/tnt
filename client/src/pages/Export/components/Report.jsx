@@ -60,9 +60,16 @@ export default function Report({ filters }) {
 
 			const scans = await fetchScans({ id: { $in: scanIds } });
 
+			const indexedScans = scans.reduce((acc, scan) => {
+				if (!acc[scan.boxId]) {
+					acc[scan.boxId] = [];
+				}
+				acc[scan.boxId].push(scan);
+				return acc;
+			}, {});
+
 			boxes.forEach(box => {
-				box.scans = [];
-				box.scans = scans.filter(scan => scan.boxId === box.id);
+				box.scans = indexedScans[box.id] || [];
 			});
 
 			setLoadingText(t('processingData'));
