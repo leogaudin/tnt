@@ -84,21 +84,6 @@ export function getProgress(box, notAfterTimestamp = Date.now()) {
 }
 
 /**
- * Returns the percentage of boxes with a given status.
- *
- * @param {Array<Box>}	sample
- * @param {Progress}	status?
- * @returns {number}
- */
-export function getStatusPercentage(sample, status = 'validated') {
-	const boxes = sample.map(box => { return { ...box, progress: box.progress || getProgress(box) } });
-
-	const deliveredBoxes = boxes.filter(box => box.progress === status).length;
-
-	return (deliveredBoxes / sample.length) * 100;
-}
-
-/**
  * Returns the repartition of boxes in a sample.
  *
  * @param {Array<Box>}	sample
