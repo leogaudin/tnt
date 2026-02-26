@@ -69,8 +69,8 @@ router.post('/', async (req: Request, res: Response) => {
 			return res.status(404).json({ error: 'Box not found' });
 
 		const schoolCoords = {
-			latitude: (box as any).schoolLatitude,
-			longitude: (box as any).schoolLongitude,
+			latitude: box.schoolLatitude,
+			longitude: box.schoolLongitude,
 		};
 
 		const scanCoords = {
@@ -81,7 +81,7 @@ router.post('/', async (req: Request, res: Response) => {
 
 		const scan = {
 			boxId,
-			adminId: (box as any).adminId,
+			adminId: box.adminId,
 			id: generateId(),
 			comment,
 			operatorId,
@@ -91,7 +91,7 @@ router.post('/', async (req: Request, res: Response) => {
 			finalDestination: isFinalDestination(schoolCoords, scanCoords),
 		};
 
-		const statusChanges = (box as any).statusChanges || {
+		const statusChanges = box.statusChanges || {
 			inProgress: null,
 			received: null,
 			reachedGps: null,
@@ -113,7 +113,7 @@ router.post('/', async (req: Request, res: Response) => {
 			} else if (!statusChanges.received) {
 				statusChanges.received = { scan: scan.id, time: scan.time };
 			}
-		} else if (Object.values(statusChanges).every((status: any) => !status)) {
+		} else if (Object.values(statusChanges).every((status) => !status)) {
 			statusChanges.inProgress = { scan: scan.id, time: scan.time };
 		}
 

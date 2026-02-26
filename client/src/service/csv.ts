@@ -3,9 +3,9 @@ import { callAPI } from '.';
 import lzstring from 'lz-string';
 import { boxFields, gpsUpdateFields } from './specific';
 
-type ParseSuccess = { box: Record<string, any> };
-type ParseError = { error: string };
-type ParseResult = ParseSuccess | ParseError;
+export type ParseSuccess = { box: Record<string, any> };
+export type ParseError = { error: string };
+export type ParseResult = ParseSuccess | ParseError;
 
 const DISTRIBUTION_FIELDS = [...Object.keys(boxFields), 'schoolLatitude', 'schoolLongitude'];
 const GPS_FIELDS: string[] = [...gpsUpdateFields, 'schoolLatitude', 'schoolLongitude'];

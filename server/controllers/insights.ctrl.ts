@@ -1,6 +1,6 @@
- import express, { Request, Response } from 'express';
+import express, { Request, Response } from 'express';
 import Admin from '../models/admins.model';
-import Box from '../models/boxes.model';
+import Box, { type IBox } from '../models/boxes.model';
 import Scan from '../models/scans.model';
 import { getQuery, haversineDistance } from '../service/index';
 import { getLastScanWithConditions } from '../service/stats';
@@ -74,13 +74,14 @@ router.post('/report', async (req: Request, res: Response) => {
 			return res.status(404).json({ error: `Admin not found` });
 
 		if (admin.publicInsights || req.headers['x-authorization'] === admin.apiKey) {
-			const boxes: any[] = await Box
+			const boxes = await Box
 				.find(
 					{ ...filters },
 					`id schoolLatitude schoolLongitude statusChanges lastScan content createdAt ${reportFields.join(' ')}`
 				)
 				.skip(skip)
-				.limit(limit);
+				.limit(limit)
+				.lean<IBox[]>();
 
 			if (!boxes.length)
 				return res.status(404).json({ error: `No boxes available` });
@@ -90,16 +91,19 @@ router.post('/report', async (req: Request, res: Response) => {
 				if (box.lastScan?.scan) {
 					scanIds.push(box.lastScan.scan);
 				}
-				for (const [_, change] of Object.entries(box.statusChanges || {})) {
-					if (change && (change as any).scan) {
-						scanIds.push((change as any).scan);
+				const sc = box.statusChanges;
+				if (sc) {
+					for (const change of Object.values(sc)) {
+						if (change?.scan) {
+							scanIds.push(change.scan);
+						}
 					}
 				}
 			}
 
 			const scans = await Scan.find({ id: { $in: scanIds } });
 
-			const indexedScans = scans.reduce<Record<string, any[]>>((acc, scan) => {
+			const indexedScans = scans.reduce<Record<string, typeof scans>>((acc, scan) => {
 				if (!acc[scan.boxId]) {
 					acc[scan.boxId] = [];
 				}
@@ -107,17 +111,14 @@ router.post('/report', async (req: Request, res: Response) => {
 				return acc;
 			}, {});
 
-			boxes.forEach((box: any) => {
-				box.scans = indexedScans[box.id] || [];
-			});
-
-			const toExport: any[] = [];
+			const toExport: Record<string, unknown>[] = [];
 
 			for (const box of boxes) {
-				const lastReachedScan = getLastScanWithConditions(box.scans, ['finalDestination']);
-				const lastMarkedAsReceivedScan = getLastScanWithConditions(box.scans, ['markedAsReceived']);
-				const lastValidatedScan = getLastScanWithConditions(box.scans, ['finalDestination', 'markedAsReceived']);
-				const lastScan = getLastScanWithConditions(box.scans, []);
+				const boxScans = indexedScans[box.id] || [];
+				const lastReachedScan = getLastScanWithConditions(boxScans, ['finalDestination']);
+				const lastMarkedAsReceivedScan = getLastScanWithConditions(boxScans, ['markedAsReceived']);
+				const lastValidatedScan = getLastScanWithConditions(boxScans, ['finalDestination', 'markedAsReceived']);
+				const lastScan = getLastScanWithConditions(boxScans, []);
 
 				const schoolCoords = {
 					latitude: box.schoolLatitude,
@@ -134,11 +135,12 @@ router.post('/report', async (req: Request, res: Response) => {
 				const receivedDistanceInMeters = receivedCoords ? Math.round(haversineDistance(schoolCoords, receivedCoords)) : '';
 				const lastScanDistanceInMeters = lastScan ? Math.round(haversineDistance(schoolCoords, lastScan.location.coords)) : '';
 
-				const result: any = { id: box.id };
+				const result: Record<string, unknown> = { id: box.id };
 
 				reportFields.forEach((field) => {
-					if (box[field]) {
-						result[field] = box[field];
+					const value = box[field as keyof IBox];
+					if (value) {
+						result[field] = value;
 					}
 				});
 

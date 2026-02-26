@@ -8,7 +8,9 @@ import {
 	gpsUpdateFields,
 	excludedKeys,
 } from '@client/service/specific.js';
-import { boxFields as serverBoxFields } from '@server/models/boxes.model.js';
+import { boxFields as serverBoxFieldsRaw } from '@server/models/boxes.model.js';
+
+const serverBoxFields: Record<string, { type: StringConstructor; required: boolean }> = serverBoxFieldsRaw;
 import { colors as appColors, API_URL as appApiUrl } from '@app/service/specific.js';
 
 // ── boxFields synchronization ──
@@ -22,8 +24,8 @@ describe('boxFields synchronization (client ↔ server)', () => {
 
 	it('each field has matching required property', () => {
 		for (const key of Object.keys(boxFields)) {
-			expect((boxFields as any)[key].required).toBe(
-				(serverBoxFields as any)[key].required,
+			expect(boxFields[key].required).toBe(
+				serverBoxFields[key].required,
 			);
 		}
 	});

@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { sha512, generateId, haversineDistance, isFinalDestination, getQuery } from '@server/service/index.js';
+import type { Request } from 'express';
 
 describe('generateId', () => {
 	it('returns a non-empty string', () => {
@@ -111,43 +112,47 @@ describe('isFinalDestination', () => {
 });
 
 describe('getQuery', () => {
-	function mockReq(query: Record<string, string> = {}, body: Record<string, any> = {}): any {
+	/** Builds a minimal Request-compatible object for getQuery. */
+	function mockReq(
+		query: Record<string, string> = {},
+		body: Record<string, unknown> = {},
+	): Pick<Request, 'query' | 'body'> & { query: Record<string, string>; body: Record<string, unknown> } {
 		return { query: { ...query }, body: { ...body } };
 	}
 
 	it('parses skip and limit from query', () => {
 		const req = mockReq({ skip: '10', limit: '50' });
-		const { skip, limit } = getQuery(req) as any;
+		const { skip, limit } = getQuery(req as Request);
 		expect(skip).toBe(10);
 		expect(limit).toBe(50);
 	});
 
 	it('removes skip and limit from req.query', () => {
 		const req = mockReq({ skip: '10', limit: '50', other: 'value' });
-		getQuery(req);
+		getQuery(req as Request);
 		expect(req.query.skip).toBeUndefined();
 		expect(req.query.limit).toBeUndefined();
 		expect(req.query.other).toBe('value');
 	});
 
 	it('returns NaN for skip/limit when not provided', () => {
-		const { skip, limit } = getQuery(mockReq()) as any;
+		const { skip, limit } = getQuery(mockReq() as Request);
 		expect(Number.isNaN(skip)).toBe(true);
 		expect(Number.isNaN(limit)).toBe(true);
 	});
 
 	it('returns empty filters when body has no filters', () => {
-		const { filters } = getQuery(mockReq()) as any;
+		const { filters } = getQuery(mockReq() as Request);
 		expect(filters).toEqual({});
 	});
 
 	it('passes through simple filters from body', () => {
-		const { filters } = getQuery(mockReq({}, { filters: { project: 'Alpha' } })) as any;
+		const { filters } = getQuery(mockReq({}, { filters: { project: 'Alpha' } }) as Request);
 		expect(filters.project).toBe('Alpha');
 	});
 
 	it('constructs $or regex for custom filter string', () => {
-		const { filters } = getQuery(mockReq({}, { filters: { custom: 'search term' } })) as any;
+		const { filters } = getQuery(mockReq({}, { filters: { custom: 'search term' } }) as Request);
 		expect(filters.$or).toBeDefined();
 		expect(Array.isArray(filters.$or)).toBe(true);
 		expect(filters.$or.length).toBeGreaterThan(0);
@@ -155,12 +160,12 @@ describe('getQuery', () => {
 	});
 
 	it('returns sort from body', () => {
-		const { sort } = getQuery(mockReq({}, { sort: { createdAt: -1 } })) as any;
+		const { sort } = getQuery(mockReq({}, { sort: { createdAt: -1 } }) as Request);
 		expect(sort).toEqual({ createdAt: -1 });
 	});
 
 	it('returns empty sort when not provided', () => {
-		const { sort } = getQuery(mockReq()) as any;
+		const { sort } = getQuery(mockReq() as Request);
 		expect(sort).toEqual({});
 	});
 });

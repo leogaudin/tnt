@@ -1,4 +1,32 @@
-import mongoose from 'mongoose';
+import mongoose, { Document } from 'mongoose';
+
+export interface IBox extends Document {
+	id: string;
+	project: string;
+	division: string;
+	district: string;
+	zone: string;
+	school: string;
+	htName: string;
+	htPhone: string;
+	schoolCode: string;
+	adminId: string;
+	createdAt: Date;
+	scans: any[];
+	schoolLatitude: number;
+	schoolLongitude: number;
+	statusChanges: {
+		inProgress: { scan: string; time: number } | null;
+		received: { scan: string; time: number } | null;
+		reachedGps: { scan: string; time: number } | null;
+		reachedAndReceived: { scan: string; time: number } | null;
+		validated: { scan: string; time: number } | null;
+	} | null;
+	content: Record<string, number> | null;
+	progress: string;
+	lastScan: { scan: string; time: number } | null;
+	packingListId: number | null;
+}
 
 // MUST MATCH boxFields VARIABLE IN client/src/service/specific.ts
 export const boxFields = {
@@ -27,4 +55,4 @@ const BoxSchema = new mongoose.Schema({
 	packingListId: { type: Number, required: false },
 });
 
-export default mongoose.model('boxes', BoxSchema);
+export default mongoose.model<IBox>('boxes', BoxSchema);

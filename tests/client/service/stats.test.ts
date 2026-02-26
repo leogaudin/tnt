@@ -1,15 +1,17 @@
 // @vitest-environment happy-dom
 import { describe, it, expect } from 'vitest';
 import {
+	type Box,
+	type Scan,
+	type StatusChanges,
 	getLastScanWithConditions,
 	getProgress,
 	sampleToContent,
 	computeInsights,
 } from '@client/service/stats.js';
 
-function makeScan(overrides: Record<string, any> = {}): any {
+function makeScan(overrides: Partial<Scan> = {}): Scan {
 	return {
-		id: 'scan-' + Math.random().toString(36).slice(2, 8),
 		time: Date.now(),
 		finalDestination: false,
 		markedAsReceived: false,
@@ -17,9 +19,16 @@ function makeScan(overrides: Record<string, any> = {}): any {
 	};
 }
 
-function makeBox(overrides: Record<string, any> = {}): any {
+const NULL_STATUS_CHANGES: StatusChanges = {
+	inProgress: null,
+	received: null,
+	reachedGps: null,
+	reachedAndReceived: null,
+	validated: null,
+};
+
+function makeBox(overrides: Partial<Box> = {}): Box {
 	return {
-		id: 'box-' + Math.random().toString(36).slice(2, 8),
 		scans: [],
 		statusChanges: null,
 		progress: 'noScans',
@@ -66,19 +75,19 @@ describe('getLastScanWithConditions', () => {
 // ── getProgress ──
 
 describe('getProgress', () => {
-	it('returns noScans when statusChanges is undefined', () => {
-		expect(getProgress({})).toBe('noScans');
+	it('returns noScans when statusChanges is null', () => {
+		expect(getProgress({ statusChanges: null })).toBe('noScans');
 	});
 
 	it('returns noScans when all statusChanges are null', () => {
 		expect(getProgress({
-			statusChanges: { inProgress: null, received: null, reachedGps: null, reachedAndReceived: null, validated: null },
+			statusChanges: { ...NULL_STATUS_CHANGES },
 		})).toBe('noScans');
 	});
 
 	it('returns inProgress when only inProgress is set', () => {
 		expect(getProgress({
-			statusChanges: { inProgress: { scan: 's1', time: 100 }, received: null, reachedGps: null, reachedAndReceived: null, validated: null },
+			statusChanges: { ...NULL_STATUS_CHANGES, inProgress: { scan: 's1', time: 100 } },
 		})).toBe('inProgress');
 	});
 
@@ -93,10 +102,11 @@ describe('getProgress', () => {
 	});
 
 	it('respects notAfterTimestamp', () => {
-		const box = {
+		const box: Pick<Box, 'statusChanges'> = {
 			statusChanges: {
-				inProgress: { scan: 's1', time: 100 }, received: null,
-				reachedGps: { scan: 's3', time: 300 }, reachedAndReceived: null,
+				...NULL_STATUS_CHANGES,
+				inProgress: { scan: 's1', time: 100 },
+				reachedGps: { scan: 's3', time: 300 },
 				validated: { scan: 's5', time: 500 },
 			},
 		};
@@ -114,8 +124,8 @@ describe('sampleToContent', () => {
 	});
 
 	it('aggregates content across boxes', () => {
-		const boxes = [
-			makeBox({ content: { books: 10, pens: 5 }, progress: 'validated', statusChanges: { validated: { scan: 's1', time: 100 } } }),
+		const boxes: Box[] = [
+			makeBox({ content: { books: 10, pens: 5 }, progress: 'validated', statusChanges: { ...NULL_STATUS_CHANGES, validated: { scan: 's1', time: 100 } } }),
 			makeBox({ content: { books: 20 }, progress: 'inProgress' }),
 		];
 		const result = sampleToContent(boxes);
@@ -126,14 +136,14 @@ describe('sampleToContent', () => {
 	});
 
 	it('handles boxes with no content', () => {
-		const boxes = [makeBox({}), makeBox({})];
+		const boxes: Box[] = [makeBox({}), makeBox({})];
 		expect(sampleToContent(boxes)).toEqual({});
 	});
 
 	it('counts validated items only for validated boxes', () => {
-		const boxes = [
-			makeBox({ content: { books: 10 }, progress: 'inProgress', statusChanges: { inProgress: { scan: 's1', time: 100 } } }),
-			makeBox({ content: { books: 5 }, progress: 'validated', statusChanges: { validated: { scan: 's2', time: 200 } } }),
+		const boxes: Box[] = [
+			makeBox({ content: { books: 10 }, progress: 'inProgress', statusChanges: { ...NULL_STATUS_CHANGES, inProgress: { scan: 's1', time: 100 } } }),
+			makeBox({ content: { books: 5 }, progress: 'validated', statusChanges: { ...NULL_STATUS_CHANGES, validated: { scan: 's2', time: 200 } } }),
 		];
 		const result = sampleToContent(boxes);
 		expect(result.books.total).toBe(15);
@@ -141,7 +151,7 @@ describe('sampleToContent', () => {
 	});
 
 	it('handles mixed content keys across boxes', () => {
-		const boxes = [
+		const boxes: Box[] = [
 			makeBox({ content: { books: 10 }, progress: 'noScans' }),
 			makeBox({ content: { pens: 5 }, progress: 'noScans' }),
 		];
@@ -153,7 +163,7 @@ describe('sampleToContent', () => {
 	});
 
 	it('treats boxes with null/undefined content as empty', () => {
-		const boxes = [
+		const boxes: Box[] = [
 			makeBox({ content: null }),
 			makeBox({ content: undefined }),
 			makeBox({ content: { books: 3 }, progress: 'noScans' }),
@@ -177,17 +187,17 @@ describe('computeInsights', () => {
 	});
 
 	it('groups insights by project by default', () => {
-		const boxes = [
+		const boxes: Box[] = [
 			makeBox({
 				project: 'A',
-				statusChanges: { inProgress: { scan: 's1', time: Date.now() - 86400000 }, received: null, reachedGps: null, reachedAndReceived: null, validated: null },
+				statusChanges: { ...NULL_STATUS_CHANGES, inProgress: { scan: 's1', time: Date.now() - 86400000 } },
 			}),
 			makeBox({
 				project: 'B',
-				statusChanges: { inProgress: { scan: 's2', time: Date.now() - 86400000 }, received: null, reachedGps: null, reachedAndReceived: null, validated: null },
+				statusChanges: { ...NULL_STATUS_CHANGES, inProgress: { scan: 's2', time: Date.now() - 86400000 } },
 			}),
 		];
-		const insights = computeInsights(boxes);
+		const insights = computeInsights(boxes) as Record<string, Record<string, unknown>>;
 		expect(insights).toHaveProperty('A');
 		expect(insights).toHaveProperty('B');
 		expect(insights.A).toHaveProperty('timeline');
@@ -196,10 +206,10 @@ describe('computeInsights', () => {
 	});
 
 	it('returns ungrouped insights when grouped=false', () => {
-		const boxes = [
+		const boxes: Box[] = [
 			makeBox({
 				project: 'A',
-				statusChanges: { inProgress: { scan: 's1', time: Date.now() - 86400000 }, received: null, reachedGps: null, reachedAndReceived: null, validated: null },
+				statusChanges: { ...NULL_STATUS_CHANGES, inProgress: { scan: 's1', time: Date.now() - 86400000 } },
 			}),
 		];
 		const insights = computeInsights(boxes, { grouped: false });
@@ -209,14 +219,14 @@ describe('computeInsights', () => {
 	});
 
 	it('filters by project with only option', () => {
-		const boxes = [
+		const boxes: Box[] = [
 			makeBox({
 				project: 'A',
-				statusChanges: { inProgress: { scan: 's1', time: Date.now() - 86400000 }, received: null, reachedGps: null, reachedAndReceived: null, validated: null },
+				statusChanges: { ...NULL_STATUS_CHANGES, inProgress: { scan: 's1', time: Date.now() - 86400000 } },
 			}),
 			makeBox({
 				project: 'B',
-				statusChanges: { inProgress: { scan: 's2', time: Date.now() - 86400000 }, received: null, reachedGps: null, reachedAndReceived: null, validated: null },
+				statusChanges: { ...NULL_STATUS_CHANGES, inProgress: { scan: 's2', time: Date.now() - 86400000 } },
 			}),
 		];
 		const insights = computeInsights(boxes, { only: ['A'] });

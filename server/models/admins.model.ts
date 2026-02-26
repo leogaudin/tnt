@@ -1,4 +1,14 @@
-import mongoose from 'mongoose';
+import mongoose, { Document } from 'mongoose';
+
+export interface IAdmin extends Document {
+	id: string;
+	email: string;
+	password: string;
+	apiKey: string;
+	createdAt: Date;
+	publicInsights: boolean;
+	projectEmails: Record<string, string> | null;
+}
 
 const AdminSchema = new mongoose.Schema({
 	id: { type: String, required: true },
@@ -10,4 +20,4 @@ const AdminSchema = new mongoose.Schema({
 	projectEmails: { type: Object, required: false },
 });
 
-export default mongoose.model('admins', AdminSchema);
+export default mongoose.model<IAdmin>('admins', AdminSchema);
