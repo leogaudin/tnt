@@ -1,11 +1,11 @@
 import express, { Request, Response } from 'express';
-import Admin from '../models/admins.model';
-import Box from '../models/boxes.model';
-import { requireApiKey } from '../service/apiKey';
-import { generateId, getQuery, isFinalDestination } from '../service/index';
+import Admin from '../models/admins.model.js';
+import Box from '../models/boxes.model.js';
+import { requireApiKey } from '../service/apiKey.js';
+import { generateId, getQuery, isFinalDestination } from '../service/index.js';
 import lzstring from 'lz-string';
-import Scan from '../models/scans.model';
-import { indexStatusChanges } from '../service/stats';
+import Scan from '../models/scans.model.js';
+import { indexStatusChanges } from '../service/stats.js';
 
 const router = express.Router();
 

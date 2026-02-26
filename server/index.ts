@@ -4,10 +4,10 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import compression from 'compression';
 
-import boxesController from './controllers/boxes.ctrl';
-import scansController from './controllers/scans.ctrl';
-import authController from './controllers/auth.ctrl';
-import insightsController from './controllers/insights.ctrl';
+import boxesController from './controllers/boxes.ctrl.js';
+import scansController from './controllers/scans.ctrl.js';
+import authController from './controllers/auth.ctrl.js';
+import insightsController from './controllers/insights.ctrl.js';
 
 dotenv.config();
 

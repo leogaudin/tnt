@@ -1,10 +1,10 @@
 import express, { Request, Response } from 'express';
-import Admin from '../models/admins.model';
-import Box, { type IBox } from '../models/boxes.model';
-import Scan from '../models/scans.model';
-import { getQuery, haversineDistance } from '../service/index';
-import { getLastScanWithConditions } from '../service/stats';
-import { requireApiKey } from '../service/apiKey';
+import Admin from '../models/admins.model.js';
+import Box, { type IBox } from '../models/boxes.model.js';
+import Scan from '../models/scans.model.js';
+import { getQuery, haversineDistance } from '../service/index.js';
+import { getLastScanWithConditions } from '../service/stats.js';
+import { requireApiKey } from '../service/apiKey.js';
 
 const router = express.Router();
 

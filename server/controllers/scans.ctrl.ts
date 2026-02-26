@@ -1,9 +1,9 @@
-import Box from '../models/boxes.model';
-import Scan from '../models/scans.model';
+import Box from '../models/boxes.model.js';
+import Scan from '../models/scans.model.js';
 import express, { Request, Response } from 'express';
-import { generateId, getQuery, isFinalDestination } from '../service/index';
-import { getProgress } from '../service/stats';
-import { requireApiKey } from '../service/apiKey';
+import { generateId, getQuery, isFinalDestination } from '../service/index.js';
+import { getProgress } from '../service/stats.js';
+import { requireApiKey } from '../service/apiKey.js';
 
 const router = express.Router();
 

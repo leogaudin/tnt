@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { boxFields } from '../models/boxes.model';
+import { boxFields } from '../models/boxes.model.js';
 
 export async function sha512(str: string): Promise<string> {
 	const buf = await crypto.subtle.digest('SHA-512', new TextEncoder().encode(str));
