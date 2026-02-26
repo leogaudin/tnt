@@ -1,7 +1,7 @@
-import Admin from '../models/admins.model.js';
+import Admin from '../models/admins.model';
 import express, { Request, Response } from 'express';
-import { generateApiKey, requireApiKey } from '../service/apiKey.js';
-import { generateId } from '../service/index.js';
+import { generateApiKey, requireApiKey } from '../service/apiKey';
+import { generateId } from '../service/index';
 
 const router = express.Router();
 

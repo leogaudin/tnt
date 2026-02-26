@@ -1,9 +1,11 @@
 {
 	"name": "server",
 	"version": "1.0.0",
-	"main": "index.ts",
+	"main": "dist/index.js",
 	"scripts": {
-		"start": "nodemon --exec tsx index.ts",
+		"dev": "nodemon --exec tsx index.ts",
+		"start": "nodemon dist/index.js",
+		"build": "tsc",
 		"deploy": "pm2 start pm2.config.cjs --env production"
 	},
 	"keywords": [],
@@ -29,6 +31,5 @@
 		"nodemon": "^3.1.7",
 		"tsx": "^4.21.0",
 		"typescript": "^5.9.3"
-	},
-	"type": "module"
+	}
 }

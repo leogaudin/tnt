@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import Admin from '../models/admins.model.js';
-import { generateId } from './index.js';
+import Admin from '../models/admins.model';
+import { generateId } from './index';
 
 export const generateApiKey = (): string => {
 	return generateId();
