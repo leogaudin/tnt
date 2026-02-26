@@ -3,7 +3,7 @@
 	"version": "1.0.0",
 	"main": "index.js",
 	"scripts": {
-		"start": "nodemon --exec babel-node index.js",
+		"start": "nodemon --exec tsx index.js",
 		"deploy": "pm2 start pm2.config.cjs --env production"
 	},
 	"keywords": [],
@@ -21,13 +21,11 @@
 		"mongoose": "^8.7.1"
 	},
 	"devDependencies": {
-		"@babel/core": "^7.25.8",
-		"@babel/node": "^7.25.7",
-		"@babel/preset-env": "^7.25.8",
 		"@types/express": "^5.0.0",
 		"@types/mongoose": "^5.11.96",
 		"@types/node": "^22.7.6",
-		"nodemon": "^3.1.7"
+		"nodemon": "^3.1.7",
+		"tsx": "^4.21.0"
 	},
 	"type": "module"
 }
