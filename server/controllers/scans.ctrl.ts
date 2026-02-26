@@ -1,25 +1,22 @@
-import Box from '../models/boxes.model.js';
-import Scan from '../models/scans.model.js';
-import express from 'express'
-import { generateId, getQuery, isFinalDestination } from '../service/index.js';
-import { getProgress } from '../service/stats.js';
-import { requireApiKey } from '../service/apiKey.js';
+import Box from '../models/boxes.model';
+import Scan from '../models/scans.model';
+import express, { Request, Response } from 'express';
+import { generateId, getQuery, isFinalDestination } from '../service/index';
+import { getProgress } from '../service/stats';
+import { requireApiKey } from '../service/apiKey';
 
 const router = express.Router();
 
-/**
- * @description	Retrieve all scans for the provided filters
- */
-router.post('/query', async (req, res) => {
+router.post('/query', async (req: Request, res: Response) => {
 	try {
-		requireApiKey(req, res, async (admin) => {
+		requireApiKey(req, res, async (admin: any) => {
 			const { skip, limit, filters } = getQuery(req);
 
 			const scans = await Scan
-								.find({ ...filters, adminId: admin.id })
-								.skip(skip)
-								.limit(limit)
-								.sort({ time: -1 });
+				.find({ ...filters, adminId: admin.id })
+				.skip(skip)
+				.limit(limit)
+				.sort({ time: -1 });
 
 			return res.status(200).json({ scans });
 		});
@@ -29,12 +26,9 @@ router.post('/query', async (req, res) => {
 	}
 });
 
-/**
- * @description	Retrieve the count of scans for the provided filters
- */
-router.post('/count', async (req, res) => {
+router.post('/count', async (req: Request, res: Response) => {
 	try {
-		requireApiKey(req, res, async (admin) => {
+		requireApiKey(req, res, async (admin: any) => {
 			const { filters } = getQuery(req);
 			const count = await Scan.countDocuments({ ...filters, adminId: admin.id });
 			return res.status(200).json({ count });
@@ -45,11 +39,11 @@ router.post('/count', async (req, res) => {
 	}
 });
 
-router.get('/box/:id', async (req, res) => {
+router.get('/box/:id', async (req: Request, res: Response) => {
 	try {
 		const { id } = req.params;
 
-		requireApiKey(req, res, async (admin) => {
+		requireApiKey(req, res, async (admin: any) => {
 			const box = await Box.findOne({ id });
 
 			if (!box)
@@ -65,10 +59,7 @@ router.get('/box/:id', async (req, res) => {
 	}
 });
 
-/**
- * @description	Add a new scan
- */
-router.post('/', async (req, res) => {
+router.post('/', async (req: Request, res: Response) => {
 	try {
 		const { boxId, comment, operatorId, time, location, markedAsReceived } = req.body;
 
@@ -78,19 +69,19 @@ router.post('/', async (req, res) => {
 			return res.status(404).json({ error: 'Box not found' });
 
 		const schoolCoords = {
-			latitude: box.schoolLatitude,
-			longitude: box.schoolLongitude,
+			latitude: (box as any).schoolLatitude,
+			longitude: (box as any).schoolLongitude,
 		};
 
 		const scanCoords = {
 			latitude: location.coords.latitude,
 			longitude: location.coords.longitude,
-			accuracy: location.coords.accuracy
+			accuracy: location.coords.accuracy,
 		};
 
 		const scan = {
 			boxId,
-			adminId: box.adminId,
+			adminId: (box as any).adminId,
 			id: generateId(),
 			comment,
 			operatorId,
@@ -100,7 +91,7 @@ router.post('/', async (req, res) => {
 			finalDestination: isFinalDestination(schoolCoords, scanCoords),
 		};
 
-		const statusChanges = box.statusChanges || {
+		const statusChanges = (box as any).statusChanges || {
 			inProgress: null,
 			received: null,
 			reachedGps: null,
@@ -110,25 +101,19 @@ router.post('/', async (req, res) => {
 
 		if (scan.finalDestination && scan.markedAsReceived && !statusChanges.validated) {
 			statusChanges.validated = { scan: scan.id, time: scan.time };
-		}
-		else if (scan.finalDestination) {
+		} else if (scan.finalDestination) {
 			if (statusChanges.received && !statusChanges.reachedAndReceived) {
 				statusChanges.reachedAndReceived = { scan: scan.id, time: scan.time };
-			}
-			else if (!statusChanges.reachedGps) {
+			} else if (!statusChanges.reachedGps) {
 				statusChanges.reachedGps = { scan: scan.id, time: scan.time };
 			}
-		}
-		else if (scan.markedAsReceived) {
+		} else if (scan.markedAsReceived) {
 			if (statusChanges.reachedGps && !statusChanges.reachedAndReceived) {
 				statusChanges.reachedAndReceived = { scan: scan.id, time: scan.time };
-			}
-			else if (!statusChanges.received) {
+			} else if (!statusChanges.received) {
 				statusChanges.received = { scan: scan.id, time: scan.time };
 			}
-		}
-
-		else if (Object.values(statusChanges).every(status => !status)) {
+		} else if (Object.values(statusChanges).every((status: any) => !status)) {
 			statusChanges.inProgress = { scan: scan.id, time: scan.time };
 		}
 
@@ -136,7 +121,6 @@ router.post('/', async (req, res) => {
 		await newScan.save();
 
 		await Box.updateOne({ id: boxId }, {
-			// $push: { scans: scan },
 			$set: {
 				statusChanges,
 				progress: getProgress({ statusChanges }),

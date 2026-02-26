@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { boxFields } from '../models/boxes.model.js';
+import { boxFields } from '../models/boxes.model';
 
 export async function sha512(str: string): Promise<string> {
 	const buf = await crypto.subtle.digest('SHA-512', new TextEncoder().encode(str));
@@ -45,14 +45,11 @@ export function isFinalDestination(schoolCoords: Coordinates, boxCoords: BoxCoor
 	return distance <= threshold;
 }
 
-interface QueryRequest {
-	query: Record<string, string>;
-	body: Record<string, any>;
-}
+import { Request } from 'express';
 
-export function getQuery(req: QueryRequest) {
-	const skip = parseInt(req.query.skip);
-	const limit = parseInt(req.query.limit);
+export function getQuery(req: Request) {
+	const skip = parseInt(req.query.skip as string);
+	const limit = parseInt(req.query.limit as string);
 	delete req.query.skip;
 	delete req.query.limit;
 

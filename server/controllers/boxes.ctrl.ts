@@ -1,21 +1,17 @@
-import express from 'express';
-import Admin from '../models/admins.model.js';
-import Box from '../models/boxes.model.js';
-import { requireApiKey } from '../service/apiKey.js';
-import { generateId, getQuery, isFinalDestination } from '../service/index.js';
+import express, { Request, Response } from 'express';
+import Admin from '../models/admins.model';
+import Box from '../models/boxes.model';
+import { requireApiKey } from '../service/apiKey';
+import { generateId, getQuery, isFinalDestination } from '../service/index';
 import lzstring from 'lz-string';
-import Scan from '../models/scans.model.js';
-import { indexStatusChanges } from '../service/stats.js';
+import Scan from '../models/scans.model';
+import { indexStatusChanges } from '../service/stats';
 
 const router = express.Router();
 
-/**
- * @description	Create new boxes
- * The boxes must be compressed and encoded in the data field.
- */
-router.post('/', async (req, res) => {
+router.post('/', async (req: Request, res: Response) => {
 	try {
-		requireApiKey(req, res, async (admin) => {
+		requireApiKey(req, res, async (admin: any) => {
 			const { data } = req.body;
 
 			if (!data) {
@@ -23,8 +19,8 @@ router.post('/', async (req, res) => {
 			}
 
 			const payload = lzstring.decompressFromEncodedURIComponent(data);
-			const instances = JSON.parse(payload);
-			instances.forEach((instance) => {
+			const instances = JSON.parse(payload!);
+			instances.forEach((instance: any) => {
 				instance.createdAt = new Date().getTime();
 				instance.id = generateId();
 				instance.adminId = admin.id;
@@ -42,12 +38,9 @@ router.post('/', async (req, res) => {
 	}
 });
 
-/**
- * @description	Retrieve a single box by its id
- */
-router.get('/one/:id', async (req, res) => {
+router.get('/one/:id', async (req: Request, res: Response) => {
 	try {
-		requireApiKey(req, res, async (admin) => {
+		requireApiKey(req, res, async (admin: any) => {
 			const box = await Box.findOne(
 				{ id: req.params.id, adminId: admin.id },
 				{ scans: 0 }
@@ -57,19 +50,15 @@ router.get('/one/:id', async (req, res) => {
 
 			return res.status(200).json({ box });
 		});
-	}
-	catch (error) {
+	} catch (error) {
 		console.error(error);
 		return res.status(500).json({ error });
 	}
 });
 
-/**
- * @description	Retrieve all boxes for the provided filters
- */
-router.post('/query', async (req, res) => {
+router.post('/query', async (req: Request, res: Response) => {
 	try {
-		requireApiKey(req, res, async (admin) => {
+		requireApiKey(req, res, async (admin: any) => {
 			const found = await Admin.findOne({ id: admin.id });
 			if (!found)
 				return res.status(404).json({ error: `Admin not found` });
@@ -96,10 +85,7 @@ router.post('/query', async (req, res) => {
 	}
 });
 
-/**
- * @description	Retrieve all possible values for a field based on the provided filters
- */
-router.post('/distinct/:field', async (req, res) => {
+router.post('/distinct/:field', async (req: Request, res: Response) => {
 	try {
 		const { filters } = getQuery(req);
 		if (!filters.adminId)
@@ -114,11 +100,7 @@ router.post('/distinct/:field', async (req, res) => {
 			if (!field)
 				return res.status(400).json({ error: 'Field required' });
 
-			const distinct = await Box
-									.distinct(
-										field,
-										{ ...filters }
-									);
+			const distinct = await Box.distinct(field, { ...filters });
 			return res.status(200).json({ distinct });
 		} else {
 			return res.status(401).json({ error: `Unauthorized` });
@@ -129,10 +111,7 @@ router.post('/distinct/:field', async (req, res) => {
 	}
 });
 
-/**
- * @description	Retrieve the count of boxes for the provided filters
- */
-router.post('/count', async (req, res) => {
+router.post('/count', async (req: Request, res: Response) => {
 	try {
 		const { filters } = getQuery(req);
 		if (!filters.adminId)
@@ -154,20 +133,14 @@ router.post('/count', async (req, res) => {
 	}
 });
 
-/**
- * @description	Delete all boxes that match the provided filters
- */
-router.delete('/', async (req, res) => {
+router.delete('/', async (req: Request, res: Response) => {
 	try {
-		requireApiKey(req, res, async (admin) => {
+		requireApiKey(req, res, async (admin: any) => {
 			const { filters } = getQuery(req);
-
-			// const boxes = await Box.find({ ...filters, adminId: admin.id }, 'id');
 
 			const results = await Promise.all([
 				Box.deleteMany({ ...filters, adminId: admin.id }),
-				// Scan.deleteMany({ boxId: { $in: boxes.map((box) => box.id) } }),
-			])
+			]);
 
 			return res.status(200).json({ deletedCount: results[0].deletedCount });
 		});
@@ -177,22 +150,17 @@ router.delete('/', async (req, res) => {
 	}
 });
 
-/**
- * @description	Update the coordinates of the provided boxes
- */
-router.post('/coords', async (req, res) => {
+router.post('/coords', async (req: Request, res: Response) => {
 	try {
-		requireApiKey(req, res, async (admin) => {
+		requireApiKey(req, res, async (admin: any) => {
 			const { coords } = req.body;
-			const coordsUpdate = coords.map((box) => {
-				return {
-					updateMany: {
-						filter: { school: box.school, district: box.district, adminId: admin.id },
-						update: { $set: { schoolLatitude: box.schoolLatitude, schoolLongitude: box.schoolLongitude } },
-						multi: true,
-					},
-				};
-			});
+			const coordsUpdate = coords.map((box: any) => ({
+				updateMany: {
+					filter: { school: box.school, district: box.district, adminId: admin.id },
+					update: { $set: { schoolLatitude: box.schoolLatitude, schoolLongitude: box.schoolLongitude } },
+					multi: true,
+				},
+			}));
 
 			const coordsUpdateResult = await Box.bulkWrite(coordsUpdate);
 			const updated = coordsUpdateResult.modifiedCount;
@@ -201,20 +169,20 @@ router.post('/coords', async (req, res) => {
 			if (updated === 0)
 				return res.status(200).json({ updated, matched, recalculated: 0 });
 
-			const boxes = await Box
+			const boxes: any[] = await Box
 				.find(
 					{
 						adminId: admin.id,
-						$or: coords.map((box) => ({ school: box.school, district: box.district }))
+						$or: coords.map((box: any) => ({ school: box.school, district: box.district }))
 					},
 					{ schoolLatitude: 1, schoolLongitude: 1, id: 1, _id: 0 }
 				);
 
 			const scans = await Scan.find({ boxId: { $in: boxes.map((box) => box.id) } });
 
-			const scansUpdate = [];
+			const scansUpdate: any[] = [];
 
-			scans.forEach((scan) => {
+			scans.forEach((scan: any) => {
 				const box = boxes.find((box) => box.id === scan.boxId);
 				if (!box) return;
 				const schoolCoords = {
@@ -240,7 +208,7 @@ router.post('/coords', async (req, res) => {
 
 			await Scan.bulkWrite(scansUpdate);
 
-			boxes.forEach((box) => {
+			boxes.forEach((box: any) => {
 				const newScans = scans.filter((scan) => scan.boxId === box.id);
 				box.scans = newScans;
 			});
@@ -256,16 +224,16 @@ router.post('/coords', async (req, res) => {
 	}
 });
 
-router.post('/boxes/reindex', async (req, res) => {
+router.post('/boxes/reindex', async (req: Request, res: Response) => {
 	try {
-		requireApiKey(req, res, async (admin) => {
-			const boxes = await Box.find({ adminId: admin.id });
+		requireApiKey(req, res, async (admin: any) => {
+			const boxes: any[] = await Box.find({ adminId: admin.id });
 			if (!boxes.length)
 				return res.status(404).json({ error: `No boxes available` });
 
 			const scans = await Scan.find({ boxId: { $in: boxes.map((box) => box.id) } });
 
-			boxes.forEach((box) => {
+			boxes.forEach((box: any) => {
 				const newScans = scans.filter((scan) => scan.boxId === box.id);
 				box.scans = newScans;
 			});
@@ -281,18 +249,18 @@ router.post('/boxes/reindex', async (req, res) => {
 	}
 });
 
-router.post('/boxes/recalculate', async (req, res) => {
+router.post('/boxes/recalculate', async (req: Request, res: Response) => {
 	try {
-		requireApiKey(req, res, async (admin) => {
-			const boxes = await Box.find({ adminId: admin.id });
+		requireApiKey(req, res, async (admin: any) => {
+			const boxes: any[] = await Box.find({ adminId: admin.id });
 			if (!boxes.length)
 				return res.status(404).json({ error: `No boxes available` });
 
 			const scans = await Scan.find({ boxId: { $in: boxes.map((box) => box.id) } });
 
-			const scansUpdate = [];
+			const scansUpdate: any[] = [];
 
-			scans.forEach((scan) => {
+			scans.forEach((scan: any) => {
 				const box = boxes.find((box) => box.id === scan.boxId);
 				if (!box) return;
 				const schoolCoords = {
@@ -319,7 +287,7 @@ router.post('/boxes/recalculate', async (req, res) => {
 			const scansUpdateResponse = await Scan.bulkWrite(scansUpdate);
 			const recalculated = scansUpdateResponse.modifiedCount;
 
-			boxes.forEach((box) => {
+			boxes.forEach((box: any) => {
 				const newScans = scans.filter((scan) => scan.boxId === box.id);
 				box.scans = newScans;
 			});

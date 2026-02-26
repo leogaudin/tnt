@@ -1,14 +1,11 @@
-import Admin from '../models/admins.model.js'
-import express from 'express'
-import { generateApiKey, requireApiKey } from '../service/apiKey.js';
-import { generateId } from '../service/index.js';
+import Admin from '../models/admins.model';
+import express, { Request, Response } from 'express';
+import { generateApiKey, requireApiKey } from '../service/apiKey';
+import { generateId } from '../service/index';
 
 const router = express.Router();
 
-/**
- * @description	Login an admin
- */
-router.post('/login', async (req, res) => {
+router.post('/login', async (req: Request, res: Response) => {
 	try {
 		const { username, password } = req.body;
 		if (!username || !password)
@@ -28,10 +25,7 @@ router.post('/login', async (req, res) => {
 	}
 });
 
-/**
- * @description	Register a new admin
- */
-router.post('/register', async (req, res) => {
+router.post('/register', async (req: Request, res: Response) => {
 	try {
 		const { username, password } = req.body;
 
@@ -45,9 +39,7 @@ router.post('/register', async (req, res) => {
 			});
 
 		const createdAt = new Date().getTime();
-
 		const id = generateId();
-
 		const apiKey = generateApiKey();
 		const user = { id, email: username, password, apiKey, createdAt, publicInsights: false };
 
@@ -61,18 +53,15 @@ router.post('/register', async (req, res) => {
 	}
 });
 
-/**
- * @description	Get the current admin
- */
-router.get('/me', async (req, res) => {
+router.get('/me', async (req: Request, res: Response) => {
 	try {
-		requireApiKey(req, req, (admin) => {
-			return res.status(200).json({ user: admin })
-		})
+		requireApiKey(req, res, (admin) => {
+			return res.status(200).json({ user: admin });
+		});
 	} catch (err) {
 		console.error(err);
 		return res.status(500).json({ message: 'Internal server error' });
 	}
-})
+});
 
 export default router;

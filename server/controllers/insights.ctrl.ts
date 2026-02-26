@@ -1,19 +1,14 @@
-import express from 'express';
-import Admin from '../models/admins.model.js';
-import Box from '../models/boxes.model.js';
-import Scan from '../models/scans.model.js';
-import { getQuery, haversineDistance } from '../service/index.js';
-import { getLastScanWithConditions } from '../service/stats.js';
-import fs from 'fs';
-import path from 'path';
-import { requireApiKey } from '../service/apiKey.js';
+ import express, { Request, Response } from 'express';
+import Admin from '../models/admins.model';
+import Box from '../models/boxes.model';
+import Scan from '../models/scans.model';
+import { getQuery, haversineDistance } from '../service/index';
+import { getLastScanWithConditions } from '../service/stats';
+import { requireApiKey } from '../service/apiKey';
 
 const router = express.Router();
 
-/**
- * @description	Toggles the publicInsights setting
- */
-router.post('/toggle', async (req, res) => {
+router.post('/toggle', async (req: Request, res: Response) => {
 	try {
 		const apiKey = req.headers['x-authorization'];
 
@@ -25,7 +20,7 @@ router.post('/toggle', async (req, res) => {
 		if (!admin)
 			return res.status(404).json({ message: 'Admin not found' });
 
-		admin.publicInsights = !!!admin.publicInsights;
+		admin.publicInsights = !admin.publicInsights;
 		await admin.save();
 		return res.status(200).json({ message: 'Successfully set insights to ' + admin.publicInsights, publicInsights: admin.publicInsights });
 	} catch (err) {
@@ -34,10 +29,7 @@ router.post('/toggle', async (req, res) => {
 	}
 });
 
-/**
- * @description	Retrieve the status changes of the current admin's boxes
- */
-router.post('/', async (req, res) => {
+router.post('/', async (req: Request, res: Response) => {
 	try {
 		const { skip, limit, filters } = getQuery(req);
 		if (!filters.adminId)
@@ -49,12 +41,12 @@ router.post('/', async (req, res) => {
 
 		if (admin.publicInsights || req.headers['x-authorization'] === admin.apiKey) {
 			const boxes = await Box
-							.find(
-								{ ...filters },
-								{ project: 1, statusChanges: 1, content: 1, _id: 0 }
-							)
-							.skip(skip)
-							.limit(limit);
+				.find(
+					{ ...filters },
+					{ project: 1, statusChanges: 1, content: 1, _id: 0 }
+				)
+				.skip(skip)
+				.limit(limit);
 
 			if (!boxes.length)
 				return res.status(404).json({ error: `No boxes available` });
@@ -65,20 +57,13 @@ router.post('/', async (req, res) => {
 		}
 	} catch (error) {
 		console.error(error);
-		return res.status(500).json({ error: error });
+		return res.status(500).json({ error });
 	}
 });
 
-/**
- * @description	Retrieve a partial or full report of the current admin's boxes
- */
-router.post('/report', async (req, res) => {
+router.post('/report', async (req: Request, res: Response) => {
 	try {
-		const reportFields = [
-			'project',
-			'school',
-			'district',
-		];
+		const reportFields = ['project', 'school', 'district'];
 
 		const { skip, limit, filters } = getQuery(req);
 		if (!filters.adminId)
@@ -89,32 +74,32 @@ router.post('/report', async (req, res) => {
 			return res.status(404).json({ error: `Admin not found` });
 
 		if (admin.publicInsights || req.headers['x-authorization'] === admin.apiKey) {
-			const boxes = await Box
-							.find(
-								{ ...filters },
-								`id schoolLatitude schoolLongitude statusChanges lastScan content createdAt ${reportFields.join(' ')}`
-							)
-							.skip(skip)
-							.limit(limit);
+			const boxes: any[] = await Box
+				.find(
+					{ ...filters },
+					`id schoolLatitude schoolLongitude statusChanges lastScan content createdAt ${reportFields.join(' ')}`
+				)
+				.skip(skip)
+				.limit(limit);
 
 			if (!boxes.length)
 				return res.status(404).json({ error: `No boxes available` });
 
-			const scanIds = [];
+			const scanIds: string[] = [];
 			for (const box of boxes) {
 				if (box.lastScan?.scan) {
 					scanIds.push(box.lastScan.scan);
 				}
 				for (const [_, change] of Object.entries(box.statusChanges || {})) {
-					if (change && change.scan) {
-						scanIds.push(change.scan);
+					if (change && (change as any).scan) {
+						scanIds.push((change as any).scan);
 					}
 				}
 			}
 
 			const scans = await Scan.find({ id: { $in: scanIds } });
 
-			const indexedScans = scans.reduce((acc, scan) => {
+			const indexedScans = scans.reduce<Record<string, any[]>>((acc, scan) => {
 				if (!acc[scan.boxId]) {
 					acc[scan.boxId] = [];
 				}
@@ -122,11 +107,11 @@ router.post('/report', async (req, res) => {
 				return acc;
 			}, {});
 
-			boxes.forEach(box => {
+			boxes.forEach((box: any) => {
 				box.scans = indexedScans[box.id] || [];
 			});
 
-			const toExport = [];
+			const toExport: any[] = [];
 
 			for (const box of boxes) {
 				const lastReachedScan = getLastScanWithConditions(box.scans, ['finalDestination']);
@@ -137,23 +122,21 @@ router.post('/report', async (req, res) => {
 				const schoolCoords = {
 					latitude: box.schoolLatitude,
 					longitude: box.schoolLongitude,
-					accuracy: 1
+					accuracy: 1,
 				};
 
 				const receivedCoords = lastMarkedAsReceivedScan ? {
 					latitude: lastMarkedAsReceivedScan.location.coords.latitude,
 					longitude: lastMarkedAsReceivedScan.location.coords.longitude,
-					accuracy: lastMarkedAsReceivedScan.location.coords.accuracy
+					accuracy: lastMarkedAsReceivedScan.location.coords.accuracy,
 				} : null;
 
 				const receivedDistanceInMeters = receivedCoords ? Math.round(haversineDistance(schoolCoords, receivedCoords)) : '';
 				const lastScanDistanceInMeters = lastScan ? Math.round(haversineDistance(schoolCoords, lastScan.location.coords)) : '';
 
-				const result = {
-					id: box.id,
-				};
+				const result: any = { id: box.id };
 
-				reportFields.forEach(field => {
+				reportFields.forEach((field) => {
 					if (box[field]) {
 						result[field] = box[field];
 					}
@@ -177,7 +160,7 @@ router.post('/report', async (req, res) => {
 					validatedDate: lastValidatedScan ? new Date(lastValidatedScan?.location.timestamp).toLocaleDateString() : '',
 					validatedComment: lastValidatedScan?.comment || '',
 					...(box.content || {}),
-				}
+				};
 
 				toExport.push(row);
 			}
@@ -188,15 +171,11 @@ router.post('/report', async (req, res) => {
 		}
 	} catch (error) {
 		console.error(error);
-		return res.status(500).json({ error: error });
+		return res.status(500).json({ error });
 	}
 });
 
-/**
- * @description	Retrieve the emails associated with each project,
- * (i.e. the emails to send a report to)
- */
-router.get('/emails', async (req, res) => {
+router.get('/emails', async (req: Request, res: Response) => {
 	try {
 		const adminId = req.query.adminId;
 		if (!adminId)
@@ -211,45 +190,22 @@ router.get('/emails', async (req, res) => {
 		}
 		const emails = admin.projectEmails || {};
 		return res.status(200).json({ emails });
-	}
-	catch (error) {
+	} catch (error) {
 		console.error(error);
-		return res.status(500).json({ error: error });
+		return res.status(500).json({ error });
 	}
-})
+});
 
-/**
- * @description	Updates the emails associated with each project
- */
-router.post('/emails', async (req, res) => {
+router.post('/emails', async (req: Request, res: Response) => {
 	try {
-		requireApiKey(req, res, async (admin) => {
+		requireApiKey(req, res, async (admin: any) => {
 			admin.projectEmails = req.body.emails;
 			await admin.save();
-
-			// Write the admin ID to a file on the server
-			// ONLY UNCOMMENT THIS IF SERVER IS SETUP ACCORDINGLY
-			//
-			// const folder = path.join('/Users/leogaudin/Downloads/');
-			// if (!fs.existsSync(folder)) {
-			// 	fs.mkdirSync(folder, { recursive: true });
-			// }
-			// const filePath = path.join(folder, 'daily_report_emails.txt');
-			// if (!fs.existsSync(filePath)) {
-			// 	fs.writeFileSync(filePath, '', 'utf8');
-			// }
-			// const content = fs.readFileSync(filePath, 'utf8');
-			// const emails = content.split(',').map(email => email.trim()).filter(email => email !== '');
-			// emails.push(admin.id);
-			// const uniqueEmails = [...new Set(emails)];
-			// const newContent = uniqueEmails.join(',');
-			// fs.writeFileSync(filePath, newContent, 'utf8');
 			return res.status(200).json({ message: 'Emails updated successfully' });
 		});
-	}
-	catch (error) {
+	} catch (error) {
 		console.error(error);
-		return res.status(500).json({ error: error });
+		return res.status(500).json({ error });
 	}
 });
 

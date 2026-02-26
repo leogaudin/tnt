@@ -1,9 +1,9 @@
 {
 	"name": "server",
 	"version": "1.0.0",
-	"main": "index.js",
+	"main": "index.ts",
 	"scripts": {
-		"start": "nodemon --exec tsx index.js",
+		"start": "nodemon --exec tsx index.ts",
 		"deploy": "pm2 start pm2.config.cjs --env production"
 	},
 	"keywords": [],
@@ -21,11 +21,14 @@
 		"mongoose": "^8.7.1"
 	},
 	"devDependencies": {
-		"@types/express": "^5.0.0",
+		"@types/compression": "^1.8.1",
+		"@types/cors": "^2.8.19",
+		"@types/express": "^4.17.25",
 		"@types/mongoose": "^5.11.96",
 		"@types/node": "^22.7.6",
 		"nodemon": "^3.1.7",
-		"tsx": "^4.21.0"
+		"tsx": "^4.21.0",
+		"typescript": "^5.9.3"
 	},
 	"type": "module"
 }
