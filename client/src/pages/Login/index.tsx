@@ -101,6 +101,7 @@ export default function Login() {
 				mx='auto'
 				direction='column'
 				justify='center'
+				order={{ base: 2, md: 1 }}
 			>
 				<FormControl my={2} id='username' isRequired>
 					<FormLabel>{t('username')}</FormLabel>
@@ -181,10 +182,10 @@ export default function Login() {
 			<Image
 				src='/favicon.svg'
 				alt='logo'
-				width='100%'
-				height='auto'
-				maxWidth='33vw'
+				maxWidth={{ base: '200px', md: '33vw' }}
+				objectFit='contain'
 				mx='auto'
+				order={{ base: 1, md: 2 }}
 			/>
 		</Flex>
 	);
