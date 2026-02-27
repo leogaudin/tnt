@@ -18,7 +18,8 @@ router.post('/login', async (req: Request, res: Response) => {
 		if (password !== user.password)
 			return res.status(401).json({ message: 'Invalid password' });
 
-		return res.status(200).json({ user });
+		const { password: _, ...safeUser } = user.toObject();
+		return res.status(200).json({ user: safeUser });
 	} catch (err) {
 		console.error(err);
 		return res.status(500).json({ message: 'Internal server error' });
@@ -46,7 +47,8 @@ router.post('/register', async (req: Request, res: Response) => {
 		const instance = new Admin(user);
 		await instance.save();
 
-		return res.status(201).json({ user });
+		const { password: _, ...safeUser } = user;
+		return res.status(201).json({ user: safeUser });
 	} catch (err) {
 		console.error(err);
 		return res.status(500).json({ message: 'Internal server error' });
@@ -56,7 +58,8 @@ router.post('/register', async (req: Request, res: Response) => {
 router.get('/me', async (req: Request, res: Response) => {
 	try {
 		requireApiKey(req, res, (admin) => {
-			return res.status(200).json({ user: admin });
+			const { password, ...safeUser } = admin.toObject ? admin.toObject() : admin;
+			return res.status(200).json({ user: safeUser });
 		});
 	} catch (err) {
 		console.error(err);

@@ -10,14 +10,19 @@ export default function Delete() {
 	const { t } = useTranslation();
 
 	const handleDelete = () => {
-		if (window.confirm(t('deletePrompt'))) {
-			deleteBoxes(filters)
+		if (!count) return;
+		if (Object.keys(filters).length === 0) {
+			if (!window.confirm(t('deletePrompt'))) return;
+			if (!window.confirm(`⚠️ No filters set — this will delete ALL ${count} boxes. Are you absolutely sure?`)) return;
+		} else {
+			if (!window.confirm(`${t('deletePrompt')} (${count} boxes)`)) return;
+		}
+		deleteBoxes(filters)
 				.then((res) => {
 					alert(`${res.deletedCount} boxes deleted`);
 					window.location.reload();
 				})
 				.catch(console.error);
-		}
 	}
 
 
