@@ -16,7 +16,7 @@ export default function Insights({ rawInsights, id }) {
 	const grouped = computeInsights(rawInsights, { grouped: true });
 
 	const handleCopy = (project: string) => {
-		const link = `${window.location.href}insights/${user.id}?project=${encodeURIComponent(project)}`;
+		const link = `${window.location.href}insights/${user!.id}?project=${encodeURIComponent(project)}`;
 		toast({
 			title: t('copied'),
 			status: 'success',

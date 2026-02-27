@@ -25,7 +25,7 @@ import type { Box, InsightBox, Scan, User, ProgressInfo, Route } from '../types'
 // ── User ──
 
 const stored = localStorage.getItem('user');
-export const user: User = stored ? JSON.parse(stored) : ({} as User);
+export const user: User | null = stored ? JSON.parse(stored) : null;
 
 export const navbarWidth = '250px';
 
@@ -67,7 +67,7 @@ export async function fetchBoxes(
 		const response = await callAPI(
 			'POST',
 			'boxes/count',
-			{ filters: { ...filters, adminId: user.id } },
+			{ filters: { ...filters, adminId: user!.id } },
 		);
 		const json = await response.json();
 		const count: number = json.count || 0;
@@ -107,7 +107,7 @@ export async function fetchReport(
 		const response = await callAPI(
 			'POST',
 			'boxes/count',
-			{ filters: { ...filters, adminId: user.id } },
+			{ filters: { ...filters, adminId: user!.id } },
 		);
 
 		const json = await response.json();
@@ -119,7 +119,7 @@ export async function fetchReport(
 			const request = await callAPI(
 				'POST',
 				`insights/report?skip=${skip}&limit=${BUFFER_LENGTH}`,
-				{ filters: { ...filters, adminId: user.id } },
+				{ filters: { ...filters, adminId: user!.id } },
 			);
 
 			if (request.status !== 200 || !request.ok)

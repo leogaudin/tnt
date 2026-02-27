@@ -56,7 +56,7 @@ export default function BoxFiltering({
 							if (value?.length && field !== boxField)
 								return { ...acc, [field]: value };
 							return acc;
-						}, { adminId: user.id }),
+						}, { adminId: user!.id }),
 					}
 				);
 
@@ -82,7 +82,7 @@ export default function BoxFiltering({
 			'POST',
 			`boxes/count`,
 			{
-				filters: { ...filters, adminId: user.id },
+				filters: { ...filters, adminId: user!.id },
 			}
 		);
 

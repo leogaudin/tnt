@@ -28,7 +28,7 @@ export default function ProjectEmails() {
      */
     const fetchEmails = async () => {
         try {
-            const response = await callAPI('GET', `insights/emails?adminId=${user.id}`);
+            const response = await callAPI('GET', `insights/emails?adminId=${user!.id}`);
             if (response.status === 404)
                 return { emails: {} };
             if (!response.ok)
@@ -47,7 +47,7 @@ export default function ProjectEmails() {
         const response = await callAPI(
             'POST',
             'boxes/distinct/project',
-            { filters: { adminId: user.id } }
+            { filters: { adminId: user!.id } }
         )
         const json = await response.json();
         return json.distinct;
@@ -68,7 +68,7 @@ export default function ProjectEmails() {
     const handleSubmit = () => {
         callAPI(
             'POST',
-            `insights/emails?adminId=${user.id}`,
+            `insights/emails?adminId=${user!.id}`,
             {
                 emails: projectEmails.reduce((acc, { project, emails }) => {
                     acc[project] = emails;

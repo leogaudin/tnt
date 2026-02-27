@@ -23,9 +23,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 							.then(res => res.json())
 		const me = res.user;
 		localStorage.setItem('user', JSON.stringify(me));
-		Object.assign(user, me);
+		Object.assign(user!, me);
 
-		const rawInsights = await fetchInsights({ adminId: user.id });
+		const rawInsights = await fetchInsights({ adminId: user!.id });
 		return { rawInsights };
 	}
 

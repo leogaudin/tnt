@@ -222,7 +222,7 @@ export default function Navbar() {
 						<Heading
 							fontSize='inherit'
 						>
-							{user.email}
+							{user!.email}
 						</Heading>
 						<LogoutButton />
 					</Stack>

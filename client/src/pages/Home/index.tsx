@@ -21,7 +21,7 @@ export default function Home() {
 			<InsightsController />
 			<Insights
 				rawInsights={rawInsights}
-				id={user.id}
+				id={user!.id}
 			/>
 		</Stack>
 	);
