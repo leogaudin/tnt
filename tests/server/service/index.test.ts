@@ -5,8 +5,8 @@ import type { Request } from 'express';
 describe('generateId', () => {
 	it('returns a non-empty string', () => {
 		const id = generateId();
-		expect(id).toBeTruthy();
-		expect(typeof id).toBe('string');
+		expect(id).toBeTypeOf('string');
+		expect(id.length).toBeGreaterThan(0);
 	});
 
 	it('returns only alphanumeric characters', () => {
@@ -109,6 +109,31 @@ describe('isFinalDestination', () => {
 	it('handles missing accuracy', () => {
 		expect(isFinalDestination(school, { latitude: 48.8566, longitude: 2.3522 })).toBe(true);
 	});
+
+	it('does not over-extend with zero accuracy', () => {
+		// ~6km away, accuracy=0 should not help
+		const distant = { latitude: 48.91, longitude: 2.3522, accuracy: 0 };
+		expect(isFinalDestination(school, distant)).toBe(false);
+	});
+
+	it('handles equator crossing', () => {
+		const a = { latitude: 0.01, longitude: 0 };
+		const b = { latitude: -0.01, longitude: 0 };
+		expect(isFinalDestination(a, b)).toBe(true);
+	});
+
+	it('handles international date line crossing', () => {
+		const a = { latitude: 0, longitude: 179.99 };
+		const b = { latitude: 0, longitude: -179.99 };
+		expect(haversineDistance(a, b)).toBeLessThan(5000);
+	});
+
+	it('returns false for antipodal points', () => {
+		expect(isFinalDestination(
+			{ latitude: 48.8566, longitude: 2.3522 },
+			{ latitude: -48.8566, longitude: -177.6478 },
+		)).toBe(false);
+	});
 });
 
 describe('getQuery', () => {
@@ -137,8 +162,8 @@ describe('getQuery', () => {
 
 	it('returns NaN for skip/limit when not provided', () => {
 		const { skip, limit } = getQuery(mockReq() as Request);
-		expect(Number.isNaN(skip)).toBe(true);
-		expect(Number.isNaN(limit)).toBe(true);
+		expect(skip).toBeNaN();
+		expect(limit).toBeNaN();
 	});
 
 	it('returns empty filters when body has no filters', () => {
@@ -153,8 +178,7 @@ describe('getQuery', () => {
 
 	it('constructs $or regex for custom filter string', () => {
 		const { filters } = getQuery(mockReq({}, { filters: { custom: 'search term' } }) as Request);
-		expect(filters.$or).toBeDefined();
-		expect(Array.isArray(filters.$or)).toBe(true);
+		expect(filters.$or).toBeInstanceOf(Array);
 		expect(filters.$or.length).toBeGreaterThan(0);
 		expect(filters.custom).toBeUndefined();
 	});

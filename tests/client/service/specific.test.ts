@@ -35,7 +35,7 @@ describe('boxFields synchronization (client ↔ server)', () => {
 
 describe('client specific.js contract', () => {
 	it('name is a non-empty string', () => {
-		expect(typeof name).toBe('string');
+		expect(name).toBeTypeOf('string');
 		expect(name.length).toBeGreaterThan(0);
 	});
 
@@ -52,23 +52,23 @@ describe('client specific.js contract', () => {
 	});
 
 	it('API_URL is a valid URL', () => {
-		expect(typeof API_URL).toBe('string');
 		expect(API_URL).toMatch(/^https?:\/\//);
 	});
 
 	it('boxFields is a non-empty object with type and required on each field', () => {
-		expect(Object.keys(boxFields).length).toBeGreaterThan(0);
-		for (const [key, field] of Object.entries(boxFields)) {
+		const entries = Object.entries(boxFields);
+		expect(entries.length).toBeGreaterThan(0);
+		for (const [key, field] of entries) {
 			expect(field, `Field "${key}" missing type`).toHaveProperty('type');
 			expect(field, `Field "${key}" missing required`).toHaveProperty('required');
 		}
 	});
 
 	it('gpsUpdateFields is a non-empty array of strings', () => {
-		expect(Array.isArray(gpsUpdateFields)).toBe(true);
+		expect(gpsUpdateFields).toBeInstanceOf(Array);
 		expect(gpsUpdateFields.length).toBeGreaterThan(0);
 		for (const field of gpsUpdateFields) {
-			expect(typeof field).toBe('string');
+			expect(field).toBeTypeOf('string');
 		}
 	});
 
@@ -79,7 +79,7 @@ describe('client specific.js contract', () => {
 	});
 
 	it('excludedKeys is a non-empty array of strings', () => {
-		expect(Array.isArray(excludedKeys)).toBe(true);
+		expect(excludedKeys).toBeInstanceOf(Array);
 		expect(excludedKeys.length).toBeGreaterThan(0);
 	});
 
@@ -105,7 +105,6 @@ describe('app specific.js contract', () => {
 	});
 
 	it('app API_URL is a valid URL', () => {
-		expect(typeof appApiUrl).toBe('string');
 		expect(appApiUrl).toMatch(/^https?:\/\//);
 	});
 });

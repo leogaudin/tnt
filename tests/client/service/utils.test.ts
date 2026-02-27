@@ -76,16 +76,13 @@ describe('getLatLngCenter', () => {
 	});
 
 	it('returns an array with two elements', () => {
-		const center = getLatLngCenter([[48.8566, 2.3522], [51.5074, -0.1278]]);
-		expect(Array.isArray(center)).toBe(true);
-		expect(center).toHaveLength(2);
+		expect(getLatLngCenter([[48.8566, 2.3522], [51.5074, -0.1278]])).toHaveLength(2);
 	});
 });
 
 describe('getZoomLevel', () => {
 	it('returns a number', () => {
-		const zoom = getZoomLevel([[48.8566, 2.3522], [51.5074, -0.1278]]);
-		expect(typeof zoom).toBe('number');
+		expect(getZoomLevel([[48.8566, 2.3522], [51.5074, -0.1278]])).toBeTypeOf('number');
 	});
 
 	it('returns higher zoom for closer points', () => {

@@ -1,18 +1,21 @@
 // @vitest-environment happy-dom
 import { describe, it, expect } from 'vitest';
 import {
-	type Box,
-	type Scan,
-	type StatusChanges,
 	getLastScanWithConditions,
 	getProgress,
 	sampleToContent,
 	computeInsights,
 } from '@client/service/stats.js';
+import type { Box, Scan, StatusChanges } from '@client/types.js';
 
 function makeScan(overrides: Partial<Scan> = {}): Scan {
 	return {
+		id: 'scan-' + Math.random().toString(36).slice(2, 8),
+		boxId: 'box-test',
+		adminId: 'admin-test',
+		operatorId: 'op-test',
 		time: Date.now(),
+		location: { coords: { latitude: 0, longitude: 0, accuracy: 0 }, timestamp: Date.now() },
 		finalDestination: false,
 		markedAsReceived: false,
 		...overrides,
@@ -29,10 +32,19 @@ const NULL_STATUS_CHANGES: StatusChanges = {
 
 function makeBox(overrides: Partial<Box> = {}): Box {
 	return {
-		scans: [],
-		statusChanges: null,
-		progress: 'noScans',
+		id: 'box-' + Math.random().toString(36).slice(2, 8),
 		project: 'TestProject',
+		district: 'TestDistrict',
+		school: 'TestSchool',
+		adminId: 'admin-test',
+		createdAt: new Date().toISOString(),
+		scans: [],
+		schoolLatitude: 0,
+		schoolLongitude: 0,
+		statusChanges: null,
+		content: null,
+		progress: 'noScans',
+		lastScan: null,
 		...overrides,
 	};
 }

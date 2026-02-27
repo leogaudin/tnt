@@ -9,6 +9,7 @@
 		"forceConsistentCasingInFileNames": true,
 		"resolveJsonModule": true,
 		"allowJs": true,
+		"jsx": "react-jsx",
 		"noEmit": true,
 		"baseUrl": ".",
 		"paths": {
@@ -17,5 +18,5 @@
 			"@app/*": ["../app/src/*"]
 		}
 	},
-	"include": ["**/*.ts"]
+	"include": ["**/*.ts", "../client/src/**/*.tsx", "../client/src/**/*.ts"]
 }

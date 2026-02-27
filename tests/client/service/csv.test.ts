@@ -110,6 +110,14 @@ describe('parseDistributionRow', () => {
 		const row = makeDistributionRow({ [optionalField]: '' });
 		expectSuccess(parseDistributionRow(row, 'admin1'));
 	});
+
+	it('rejects completely empty row', () => {
+		expectError(parseDistributionRow([], 'admin1'));
+	});
+
+	it('rejects row with only some fields', () => {
+		expectError(parseDistributionRow(['project1'], 'admin1'));
+	});
 });
 
 // ── parseGPSUpdateRow ──
@@ -153,6 +161,26 @@ describe('parseGPSUpdateRow', () => {
 	it('is more lenient with first row (header detection)', () => {
 		const row = makeGPSRow();
 		expectSuccess(parseGPSUpdateRow(row, true));
+	});
+
+	it('rejects completely empty row', () => {
+		expectError(parseGPSUpdateRow([]));
+	});
+
+	it('rejects row with empty strings', () => {
+		expectError(parseGPSUpdateRow(['', '', '']));
+	});
+
+	it('rejects invalid longitude', () => {
+		const row = makeGPSRow({ schoolLongitude: 'xyz' });
+		expectError(parseGPSUpdateRow(row, false));
+	});
+
+	it('handles negative coordinates (southern/western hemisphere)', () => {
+		const row = makeGPSRow({ schoolLatitude: '-33.8688', schoolLongitude: '151.2093' });
+		const { box } = expectSuccess(parseGPSUpdateRow(row, false));
+		expect(box.schoolLatitude).toBeCloseTo(-33.8688, 3);
+		expect(box.schoolLongitude).toBeCloseTo(151.2093, 3);
 	});
 });
 

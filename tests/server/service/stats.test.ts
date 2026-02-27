@@ -1,19 +1,21 @@
 import { describe, it, expect } from 'vitest';
 import {
-	type Box,
-	type Scan,
-	type StatusChanges,
 	getLastScanWithConditions,
 	getProgress,
 	indexStatusChanges,
 } from '@server/service/stats.js';
+import type { Box, Scan, StatusChanges } from '@server/types.js';
 
 let scanCounter = 0;
 
 function makeScan(overrides: Partial<Scan> = {}): Scan {
 	return {
 		id: 'scan-' + (++scanCounter),
+		boxId: 'box-test',
+		adminId: 'admin-test',
+		operatorId: 'op-test',
 		time: Date.now(),
+		location: { coords: { latitude: 0, longitude: 0, accuracy: 0 }, timestamp: Date.now() },
 		finalDestination: false,
 		markedAsReceived: false,
 		...overrides,
@@ -31,10 +33,18 @@ const NULL_STATUS_CHANGES: StatusChanges = {
 function makeBox(overrides: Partial<Box> = {}): Box {
 	return {
 		id: 'box-' + Math.random().toString(36).slice(2, 8),
-		scans: [],
-		statusChanges: null,
 		project: 'TestProject',
+		district: 'TestDistrict',
+		school: 'TestSchool',
+		adminId: 'admin-test',
+		createdAt: new Date(),
+		scans: [],
+		schoolLatitude: 0,
+		schoolLongitude: 0,
+		statusChanges: null,
+		content: null,
 		progress: 'noScans',
+		lastScan: null,
 		...overrides,
 	};
 }
@@ -219,5 +229,43 @@ describe('indexStatusChanges', () => {
 		expect(ops).toHaveLength(1);
 		expect(ops[0].updateOne).toBeDefined();
 		expect(ops[0].updateOne.filter).toEqual({ id: 'box1' });
+	});
+
+	it('does not set validated if only GPS or only received', () => {
+		const s1 = makeScan({ time: 100 });
+		const s2 = makeScan({ time: 200, finalDestination: true });
+		const s3 = makeScan({ time: 300, markedAsReceived: true });
+		const ops = indexStatusChanges([makeBox({ scans: [s1, s2, s3] })]);
+		const sc = ops[0].updateOne.update.$set.statusChanges;
+		expect(sc.validated).toBeNull();
+		expect(sc.reachedAndReceived).toBeTruthy();
+	});
+
+	it('handles rapid duplicate scans correctly', () => {
+		const same = { time: 100, finalDestination: false, markedAsReceived: false };
+		const ops = indexStatusChanges([makeBox({ scans: [makeScan(same), makeScan(same), makeScan(same)] })]);
+		const sc = ops[0].updateOne.update.$set.statusChanges;
+		expect(sc.inProgress).toBeTruthy();
+		expect(sc.received).toBeNull();
+	});
+
+	it('processes multiple boxes independently', () => {
+		const box1 = makeBox({ id: 'box-a', scans: [makeScan({ time: 100 })] });
+		const box2 = makeBox({ id: 'box-b', scans: [makeScan({ time: 100, finalDestination: true, markedAsReceived: true })] });
+		const ops = indexStatusChanges([box1, box2]);
+		expect(ops).toHaveLength(2);
+		expect(ops[0].updateOne.update.$set.progress).toBe('inProgress');
+		expect(ops[1].updateOne.update.$set.progress).toBe('validated');
+	});
+
+	it('sets correct progress for GPS-then-received sequence', () => {
+		const s1 = makeScan({ time: 100 });
+		const s2 = makeScan({ time: 200, finalDestination: true });
+		const s3 = makeScan({ time: 300, markedAsReceived: true });
+		const ops = indexStatusChanges([makeBox({ scans: [s1, s2, s3] })]);
+		const sc = ops[0].updateOne.update.$set.statusChanges;
+		expect(sc.reachedGps).toBeTruthy();
+		expect(sc.reachedAndReceived).toEqual({ scan: s3.id, time: 300 });
+		expect(sc.validated).toBeNull();
 	});
 });
