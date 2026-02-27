@@ -20,18 +20,28 @@ import { timeAgo } from '../service/utils';
 import { excludedKeys } from '../service/specific';
 import SchoolModal from './SchoolModal';
 import { callAPI, icons, fetchBoxScans, deleteBoxes } from '../service';
+import type { Box, Scan } from '../types';
 import { useEffect, useState } from 'react';
 import Loading from './Loading';
 import BoxContent from './BoxContent';
+
+interface School {
+	name: string;
+	boxes: Box[];
+}
 
 export default function BoxModal({
 	isOpen,
 	onClose,
 	box,
+}: {
+	isOpen: boolean;
+	onClose: () => void;
+	box: Box;
 }) {
 	const { t } = useTranslation();
-	const [scans, setScans] = useState(null);
-	const [school, setSchool] = useState(null);
+	const [scans, setScans] = useState<Scan[] | null>(null);
+	const [school, setSchool] = useState<School | null>(null);
 	const { isOpen: isSchoolOpen, onOpen: onSchoolOpen, onClose: onSchoolClose } = useDisclosure();
 
 	const fetchSchool = async () => {
@@ -42,7 +52,7 @@ export default function BoxModal({
 		);
 		const json = await response.json();
 
-		const school = {
+		const school: School = {
 			name: box.school,
 			boxes: json.boxes,
 		};
@@ -58,13 +68,13 @@ export default function BoxModal({
 		}
 	}, [isOpen]);
 
-	const fetchScans = async (_, __) => {
-		return [...scans].sort((a, b) => b.time - a.time);
+	const fetchScans = async () => {
+		return [...(scans || [])].sort((a, b) => b.time - a.time);
 	};
 
 	const handleDelete = async () => {
 		if (window.confirm(t('deletePrompt'))) {
-			await deleteBoxes([{ field: 'id', value: box.id }]);
+			await deleteBoxes({ id: box.id });
 			onClose();
 			window.location.reload();
 		}
@@ -98,11 +108,11 @@ export default function BoxModal({
 									gap={2}
 								>
 									{Object.entries(box).map(([key, value]) => {
-										if (excludedKeys.includes(key) || !value)
+										if ((excludedKeys as readonly string[]).includes(key) || !value)
 											return null;
 										return (
 											<Text key={key}>
-												<code>{t(key)}</code>: <strong>{value}</strong>
+												<code>{t(key)}</code>: <strong>{String(value)}</strong>
 											</Text>
 										);
 									})}
@@ -154,6 +164,7 @@ export default function BoxModal({
 								>
 									<ScansMap box={{ ...box, scans }} />
 									<PagedTable
+										count={scans.length}
 										fetchElements={fetchScans}
 										headers={[
 											t('time'),
@@ -168,8 +179,9 @@ export default function BoxModal({
 											'finalDestination',
 										]}
 										transforms={{
-											time: (time) => timeAgo(time),
+											time: (time: number) => timeAgo(time),
 										}}
+										onRowClick={() => {}}
 										allowToChoosePageSize={false}
 									/>
 								</Flex>

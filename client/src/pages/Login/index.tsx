@@ -91,7 +91,7 @@ export default function Login() {
 
 	useEffect(() => {
 		if (showFullForm)
-			document.getElementById('password').focus();
+			document.getElementById('password')?.focus();
 	}, [showFullForm]);
 
 	return (

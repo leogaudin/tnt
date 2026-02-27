@@ -15,17 +15,28 @@ import BoxCard from './BoxCard';
 import ContentDelivered from './ContentDelivered';
 import { sampleToContent } from '../service/stats';
 
+import type { Box } from '../types';
+
+interface School {
+	name: string;
+	boxes: Box[];
+}
+
 export default function SchoolModal({
 	isOpen,
 	onClose,
 	school,
+}: {
+	isOpen: boolean;
+	onClose: () => void;
+	school: School | null;
 }) {
 	if (!school || !school.boxes || !Array.isArray(school.boxes)) {
 		return null;
 	}
 	const { t } = useTranslation();
 
-	const projects = [...new Set(school.boxes.map((box) => box.project))];
+	const projects: string[] = [...new Set(school.boxes.map((box: Box) => box.project))];
 
 	const ContentDeliveredByProject = () => {
 		return (

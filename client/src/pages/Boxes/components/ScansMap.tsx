@@ -9,7 +9,7 @@ function ScansMap({
 	box,
 }) {
 	const { t } = useTranslation();
-	const containerRef = useRef(null);
+	const containerRef = useRef<HTMLDivElement>(null);
 	const scans = box.scans || [];
 
 	if (scans.length === 0)
@@ -37,7 +37,7 @@ function ScansMap({
 		const zoom = getZoomLevel(coords);
 
 		const map = new Map({
-			container: containerRef.current,
+			container: containerRef.current!,
 			style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
 			center,
 			zoom,
@@ -116,8 +116,8 @@ function ScansMap({
 		});
 	};
 
-	const addLines = (map) => {
-		const lines = [];
+	const addLines = (map: any) => {
+		const lines: number[][][] = [];
 
 		scans.forEach((scan, index) => {
 			if (index === 0) return;

@@ -1,6 +1,6 @@
 import i18n from '../language';
 
-import Login from '../pages/Login'
+import Login from '../pages/Login';
 import Home from '../pages/Home';
 import Boxes from '../pages/Boxes';
 import Scans from '../pages/Scans';
@@ -16,29 +16,30 @@ import { BiImport, BiExport } from 'react-icons/bi';
 import { MdDelete, MdEdit } from 'react-icons/md';
 import { TbProgressCheck } from 'react-icons/tb';
 import { BsMailbox } from 'react-icons/bs';
-
 import { palette } from '../theme';
 import { API_URL } from './specific';
 import { json2csv } from 'json-2-csv';
 
-export const user = JSON.parse(localStorage.getItem('user'));
+import type { Box, InsightBox, Scan, User, ProgressInfo, Route } from '../types';
+
+// ── User ──
+
+const stored = localStorage.getItem('user');
+export const user: User = stored ? JSON.parse(stored) : ({} as User);
 
 export const navbarWidth = '250px';
 
-/**
- * Calls the API with the given parameters
- *
- * @param {String} 			method		HTTP method to be used
- * @param {String} 			endpoint	Endpoint to be called
- * @param {Object}			data		Data to be sent in the request
- * @param {Object}			headers		Headers to be sent in the request
- * @param {AbortSignal}		signal		AbortSignal to be used in the request
- *
- * @returns {Promise<Response>}			Response of the request
- */
-export const callAPI = async (method, endpoint, data = null, headers = {}, signal = null) => {
+// ── API helpers ──
+
+export const callAPI = async (
+	method: string,
+	endpoint: string,
+	data: unknown = null,
+	headers: Record<string, string> = {},
+	signal: AbortSignal | null = null,
+): Promise<Response> => {
 	const authorization = user?.apiKey || '';
-	const requestHeaders = {
+	const requestHeaders: Record<string, string> = {
 		'Content-Type': 'application/json',
 		'Accept-Encoding': 'gzip, deflate',
 		'X-Authorization': authorization,
@@ -46,36 +47,30 @@ export const callAPI = async (method, endpoint, data = null, headers = {}, signa
 	};
 
 	const response = await fetch(`${API_URL}/${endpoint}`, {
-		method: method,
+		method,
 		headers: requestHeaders,
 		body: data ? JSON.stringify(data) : null,
-		signal: signal,
+		signal: signal ?? undefined,
 	});
 
 	return response;
-}
+};
 
-/**
- * Fetches boxes from the API
- *
- * @param {object}		filters		Filters to be applied to the request
- *
- * @returns {Promise<Array>}			Array of boxes
- */
-export async function fetchBoxes(filters = {}, sort = {}) {
+export async function fetchBoxes(
+	filters: Record<string, unknown> = {},
+	sort: Record<string, unknown> = {},
+): Promise<Box[] | null> {
 	try {
 		const BUFFER_LENGTH = 10_000;
-		const boxes = [];
+		const boxes: Box[] = [];
 
 		const response = await callAPI(
 			'POST',
-			`boxes/count`,
-			{
-				filters: { ...filters, adminId: user.id }
-			}
+			'boxes/count',
+			{ filters: { ...filters, adminId: user.id } },
 		);
 		const json = await response.json();
-		const count = json.count || 0;
+		const count: number = json.count || 0;
 
 		while (boxes.length < count) {
 			const skip = boxes.length;
@@ -83,7 +78,7 @@ export async function fetchBoxes(filters = {}, sort = {}) {
 			const request = await callAPI(
 				'POST',
 				`boxes/query?skip=${skip}&limit=${BUFFER_LENGTH}`,
-				{ filters, sort }
+				{ filters, sort },
 			);
 
 			if (request.status !== 200 || !request.ok)
@@ -102,26 +97,21 @@ export async function fetchBoxes(filters = {}, sort = {}) {
 	}
 }
 
-/**
- * Fetches report from the API
- *
- * @param {object}		filters		Filters to be applied to the request
- *
- * @returns {Promise<string>}		Lines of the report
- */
-export async function fetchReport(filters = {}) {
+export async function fetchReport(
+	filters: Record<string, unknown> = {},
+): Promise<string | null> {
 	try {
 		const BUFFER_LENGTH = 5_000;
-		const boxes = [];
+		const boxes: Record<string, unknown>[] = [];
 
 		const response = await callAPI(
 			'POST',
-			`boxes/count`,
-			{ filters: { ...filters, adminId: user.id } }
+			'boxes/count',
+			{ filters: { ...filters, adminId: user.id } },
 		);
 
 		const json = await response.json();
-		const count = json.count || 0;
+		const count: number = json.count || 0;
 
 		while (boxes.length < count) {
 			const skip = boxes.length;
@@ -129,7 +119,7 @@ export async function fetchReport(filters = {}) {
 			const request = await callAPI(
 				'POST',
 				`insights/report?skip=${skip}&limit=${BUFFER_LENGTH}`,
-				{ filters: { ...filters, adminId: user.id } }
+				{ filters: { ...filters, adminId: user.id } },
 			);
 
 			if (request.status !== 200 || !request.ok)
@@ -143,14 +133,14 @@ export async function fetchReport(filters = {}) {
 
 		const delimiter = ',';
 		const newline = '\n';
-		const keys = Object.keys(boxes[0])
+		const keys = Object.keys(boxes[0]);
 		const headers = keys.map(header => i18n.t(header)).join(delimiter);
 		const report = json2csv(
 			boxes,
 			{
 				delimiter: { field: delimiter, eol: newline },
-				prependHeader: false
-			}
+				prependHeader: false,
+			},
 		);
 		return `${headers}${newline}${report}`;
 	} catch (err) {
@@ -159,44 +149,33 @@ export async function fetchReport(filters = {}) {
 	}
 }
 
-/**
- * Deletes boxes from the API
- *
- * @param {object}		filters		Filters to be applied to the request
- *
- * @returns {Promise<{deletedCount: Number}>}			Number of deleted boxes
- */
-export async function deleteBoxes(filters = {}) {
+export async function deleteBoxes(
+	filters: Record<string, unknown> = {},
+): Promise<{ deletedCount: number }> {
 	const response = await callAPI(
 		'DELETE',
 		'boxes',
-		{ filters }
+		{ filters },
 	);
 	const json = await response.json();
 
 	return { deletedCount: json.deletedCount };
 }
 
-/**
- * Fetches insights from the API
- *
- * @param {object}		filters		Filters to be applied to the request
- * @param {boolean}		grouped		Whether the insights should be grouped or not
- *
- * @returns {Promise<object>}		Insights
- */
-export async function fetchInsights(filters = {}) {
+export async function fetchInsights(
+	filters: Record<string, unknown> = {},
+): Promise<InsightBox[] | null> {
 	try {
 		const BUFFER_LENGTH = 25_000;
-		const boxes = [];
+		const boxes: InsightBox[] = [];
 
 		const response = await callAPI(
 			'POST',
-			`boxes/count`,
-			{ filters }
+			'boxes/count',
+			{ filters },
 		);
 		const json = await response.json();
-		const count = json.count || 0;
+		const count: number = json.count || 0;
 
 		while (boxes.length < count) {
 			const skip = boxes.length;
@@ -204,7 +183,7 @@ export async function fetchInsights(filters = {}) {
 			const request = await callAPI(
 				'POST',
 				`insights?skip=${skip}&limit=${BUFFER_LENGTH}`,
-				{ filters }
+				{ filters },
 			);
 
 			if (request.status !== 200 || !request.ok)
@@ -216,7 +195,9 @@ export async function fetchInsights(filters = {}) {
 				boxes.push(...response.boxes);
 		}
 
-		boxes.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+		boxes.sort((a: InsightBox, b: InsightBox) =>
+			new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+		);
 		return boxes;
 	} catch (err) {
 		console.error(err);
@@ -224,14 +205,16 @@ export async function fetchInsights(filters = {}) {
 	}
 }
 
-export async function fetchBoxScans(boxId) {
+export async function fetchBoxScans(boxId: string): Promise<Scan[]> {
 	const response = await callAPI(
 		'GET',
-		`scan/box/${boxId}`
+		`scan/box/${boxId}`,
 	);
 	const json = await response.json();
 	return json.scans;
 }
+
+// ── Icons ──
 
 export const icons = {
 	home: IoHome,
@@ -260,9 +243,11 @@ export const icons = {
 	search: FaSearch,
 	edit: MdEdit,
 	link: FaLink,
-}
+} as const;
 
-export const getRoutes = () => [
+// ── Routes ──
+
+export const getRoutes = (): Route[] => [
 	{
 		path: '/auth',
 		component: Login,
@@ -321,7 +306,9 @@ export const getRoutes = () => [
 	},
 ];
 
-export const progresses = {
+// ── Progresses ──
+
+export const progresses: Record<string, ProgressInfo> = {
 	total: {
 		color: palette.text,
 		userAvailable: false,

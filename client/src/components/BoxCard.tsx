@@ -14,19 +14,22 @@ import { haversineDistance } from '../service/utils';
 import Pill from './Pill';
 import { getProgress } from '../service/stats';
 import { callAPI, progresses } from '../service';
+import type { Box, Scan } from '../types';
 import BoxModal from './BoxModal';
 import { useEffect, useState } from 'react';
 import Loading from '../components/Loading';
 
 export default function BoxCard({
 	box,
+}: {
+	box: Box;
 }) {
 	const { t } = useTranslation();
 	const { onOpen, onClose, isOpen } = useDisclosure();
-	const [lastScan, setLastScan] = useState(null);
+	const [lastScan, setLastScan] = useState<Scan | null>(null);
 	const [loading, setLoading] = useState(false);
 
-	const fetchLastScan = async () => {
+	const fetchLastScan = async (): Promise<Scan | null> => {
 		if (!box.lastScan) {
 			return null;
 		}
@@ -65,6 +68,8 @@ export default function BoxCard({
 							{ latitude: box.schoolLatitude, longitude: box.schoolLongitude },
 						) / 1000)
 						: null;
+
+	const ProgressIcon = progress?.icon;
 
 	return (
 		<>
@@ -138,7 +143,7 @@ export default function BoxCard({
 									variant='solid'
 									text={t(progressKey)}
 									color={progress.color}
-									icon={<progress.icon />}
+									icon={ProgressIcon ? <ProgressIcon /> : undefined}
 								/>
 								{lastScan &&
 									(
@@ -154,7 +159,7 @@ export default function BoxCard({
 													fontWeight: 'bold',
 												}}
 											>
-												{t('kmAway', { count: lastSeen } )}
+												{t('kmAway', { count: lastSeen ?? undefined })}
 											</span>
 										</Text>
 									)

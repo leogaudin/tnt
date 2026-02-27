@@ -1,7 +1,16 @@
 import {
 	HStack,
 	useToken,
+	type StackProps,
 } from '@chakra-ui/react';
+import type { ReactNode } from 'react';
+
+interface PillProps extends StackProps {
+	color: string;
+	text?: string;
+	icon?: ReactNode;
+	variant?: string;
+}
 
 export default function Pill({
 	color,
@@ -9,16 +18,17 @@ export default function Pill({
 	icon,
 	variant,
 	...props
-}) {
+}: PillProps) {
 	const [red, orange, green] = useToken('colors', ['red.500', 'orange.500', 'green.500']);
 
-	if (color === 'error') color = red;
-	if (color === 'warning') color = orange;
-	if (color === 'success') color = green;
+	let resolvedColor = color;
+	if (resolvedColor === 'error') resolvedColor = red;
+	if (resolvedColor === 'warning') resolvedColor = orange;
+	if (resolvedColor === 'success') resolvedColor = green;
 
 	const additionalStyles = {
-		backgroundColor: variant === 'solid' ? color + '25' : 'transparent',
-		border: variant === 'outline' ? `1.5px solid ${color}` : 'none',
+		backgroundColor: variant === 'solid' ? resolvedColor + '25' : 'transparent',
+		border: variant === 'outline' ? `1.5px solid ${resolvedColor}` : 'none',
 		justifyContent: icon ? 'left' : 'center',
 		padding: text ? '0.25rem 0.75rem' : '0.5rem',
 	};
@@ -26,9 +36,8 @@ export default function Pill({
 	return (
 		<HStack
 			style={{
-				color: color,
+				color: resolvedColor,
 				borderRadius: 20,
-				padding: '0.25rem 0.75rem',
 				fontWeight: 600,
 				margin: '0.25rem',
 				cursor: 'inherit',

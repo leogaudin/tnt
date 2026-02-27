@@ -1,4 +1,5 @@
 import mongoose, { Document } from 'mongoose';
+import type { ScanLocation } from '../types';
 
 export interface IScan extends Document {
 	id: string;
@@ -6,7 +7,7 @@ export interface IScan extends Document {
 	adminId: string;
 	operatorId: string;
 	time: number;
-	location: Record<string, unknown>;
+	location: ScanLocation;
 	finalDestination: boolean;
 	markedAsReceived: boolean;
 	comment?: string;

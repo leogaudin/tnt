@@ -1,35 +1,4 @@
-export type Progress = 'noScans' | 'inProgress' | 'reachedGps' | 'received' | 'reachedAndReceived' | 'validated';
-
-export interface Scan {
-	id: string;
-	time: number;
-	finalDestination: boolean;
-	markedAsReceived: boolean;
-	comment?: string;
-	[key: string]: any;
-}
-
-export interface StatusChange {
-	scan: string;
-	time: number;
-}
-
-export interface StatusChanges {
-	inProgress: StatusChange | null;
-	received: StatusChange | null;
-	reachedGps: StatusChange | null;
-	reachedAndReceived: StatusChange | null;
-	validated: StatusChange | null;
-}
-
-export interface Box {
-	id: string;
-	scans: Scan[];
-	statusChanges: StatusChanges | null;
-	project: string;
-	progress: Progress;
-	content?: Record<string, number>;
-}
+import type { Progress, StatusChanges, Box } from '../types';
 
 const ORDERED_STATUSES = [
 	'inProgress',
@@ -39,11 +8,11 @@ const ORDERED_STATUSES = [
 	'validated',
 ] as const satisfies readonly (keyof StatusChanges)[];
 
-export function getLastScanWithConditions(
-	scans: Scan[] | null | undefined,
+export function getLastScanWithConditions<T extends { time: number; [key: string]: any }>(
+	scans: T[] | null | undefined,
 	conditions: string[] = [],
-): Scan | null {
-	return (scans ?? []).reduce<Scan | null>((last, scan) => {
+): T | null {
+	return (scans ?? []).reduce<T | null>((last, scan) => {
 		const matchesAll = conditions.every((cond) => scan[cond]);
 		if (matchesAll && scan.time > (last?.time ?? 0)) return scan;
 		return last;

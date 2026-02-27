@@ -1,4 +1,5 @@
 import mongoose, { Document } from 'mongoose';
+import type { StatusChanges } from '../types';
 
 export interface IBox extends Document {
 	id: string;
@@ -15,13 +16,7 @@ export interface IBox extends Document {
 	scans: any[];
 	schoolLatitude: number;
 	schoolLongitude: number;
-	statusChanges: {
-		inProgress: { scan: string; time: number } | null;
-		received: { scan: string; time: number } | null;
-		reachedGps: { scan: string; time: number } | null;
-		reachedAndReceived: { scan: string; time: number } | null;
-		validated: { scan: string; time: number } | null;
-	} | null;
+	statusChanges: StatusChanges | null;
 	content: Record<string, number> | null;
 	progress: string;
 	lastScan: { scan: string; time: number } | null;

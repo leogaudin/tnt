@@ -1,61 +1,68 @@
 import { Flex } from '@chakra-ui/react';
 import { palette } from '../theme';
-import { useRef, useState } from 'react';
+import { useRef, useState, type ReactNode, type DragEvent, type ChangeEvent, type MouseEvent } from 'react';
+
+interface DragDropProps {
+	onFile: (file: File) => void;
+	height?: number;
+	accept?: string[];
+	children?: ReactNode;
+}
 
 export default function DragDrop({
 	onFile,
 	height = 400,
 	accept = ['.csv'],
 	children,
-}) {
+}: DragDropProps) {
 	const [hover, setHover] = useState(false);
-	const inputFile = useRef(null);
+	const inputFile = useRef<HTMLInputElement>(null);
 
-	const handleDragEnter = e => {
+	const handleDragEnter = (e: DragEvent<HTMLDivElement>) => {
 		e.preventDefault();
 		setHover(true);
 		e.stopPropagation();
 	};
 
-	const handleDragLeave = e => {
+	const handleDragLeave = (e: DragEvent<HTMLDivElement>) => {
 		e.preventDefault();
 		setHover(false);
 		e.stopPropagation();
 	};
 
-	const handleDragOver = e => {
+	const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
 		e.preventDefault();
 		setHover(true);
 		e.stopPropagation();
 	};
 
-	const handleDrop = e => {
+	const handleDrop = (e: DragEvent<HTMLDivElement>) => {
 		e.preventDefault();
 		onChangeFile(e);
 		e.stopPropagation();
 	};
 
-	const handleClick = e => {
-		inputFile.current.click();
+	const handleClick = (e: MouseEvent<HTMLDivElement>) => {
+		inputFile.current?.click();
 		e.stopPropagation();
 	}
 
-	const onChangeFile = e => {
-		let files = [];
+	const onChangeFile = (e: DragEvent<HTMLDivElement> | ChangeEvent<HTMLInputElement>) => {
+		let files: FileList | null = null;
 		e.preventDefault();
 		setHover(false);
 
-		if (e.dataTransfer && e.dataTransfer.files)
+		if ('dataTransfer' in e && e.dataTransfer?.files)
 			files = e.dataTransfer.files;
-		else if (e.target.files)
-			files = e.target.files;
+		else if ('target' in e && (e.target as HTMLInputElement).files)
+			files = (e.target as HTMLInputElement).files;
 
-		if (files[0] && accept.indexOf(`.${files[0].name.split('.').pop()}`) === -1) {
-			e.target.value = null;
+		if (files?.[0] && accept.indexOf(`.${files[0].name.split('.').pop()}`) === -1) {
+			if ('target' in e) (e.target as HTMLInputElement).value = '';
 			return alert('Invalid file type');
 		}
 
-		onFile(files[0]);
+		if (files?.[0]) onFile(files[0]);
 	}
 
 	return (

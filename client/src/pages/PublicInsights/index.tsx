@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { fetchInsights } from '../../service';
+import type { InsightBox } from '../../types';
 import Insights from '../Home/components/Insights';
 import BigLoading from '../../components/BoxesLoading';
 import ProjectInsights from '../Home/components/ProjectInsights';
@@ -12,8 +13,8 @@ export default function PublicInsights() {
 	const { id } = useParams();
 	const [searchParams] = useSearchParams();
 	const project = searchParams.get('project');
-	const [rawInsights, setRawInsights] = useState(null);
-	const [projectInsights, setProjectInsights] = useState(null);
+	const [rawInsights, setRawInsights] = useState<InsightBox[] | null>(null);
+	const [projectInsights, setProjectInsights] = useState<InsightBox[] | null>(null);
 	const [nothingToSee, setNothingToSee] = useState(false);
 
 	useEffect(() => {
@@ -51,7 +52,6 @@ export default function PublicInsights() {
 					insights={computeInsights(projectInsights, { grouped: false })}
 					project={project}
 					menu={null}
-					id={id}
 				/>
 			}
 			{rawInsights &&

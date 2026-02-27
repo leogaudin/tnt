@@ -15,6 +15,16 @@ import { useTranslation } from 'react-i18next';
 import Pagination from './Pagination';
 import Loading from './Loading';
 
+interface PagedTableProps {
+	count: number;
+	fetchElements: (...args: any[]) => Promise<any[]>;
+	headers: string[];
+	fields: string[];
+	transforms: Record<string, (val: any) => any>;
+	onRowClick?: (element: any) => void;
+	allowToChoosePageSize?: boolean;
+}
+
 export default function PagedTable({
 	count,
 	fetchElements,
@@ -23,10 +33,10 @@ export default function PagedTable({
 	transforms,
 	onRowClick,
 	allowToChoosePageSize = true,
-}) {
+}: PagedTableProps) {
 	const [currentPage, setCurrentPage] = useState(1);
 	const [pageSize, setPageSize] = useState(50);
-	const [elements, setElements] = useState(null);
+	const [elements, setElements] = useState<any[] | null>(null);
 	const [loading, setLoading] = useState(false);
 
 	const { t } = useTranslation();
@@ -45,7 +55,7 @@ export default function PagedTable({
 			setCurrentPage(1);
 	}, [count, pageSize]);
 
-	const conditionPill = (condition) => {
+	const conditionPill = (condition: boolean) => {
 		return condition
 			? <Pill
 				variant='solid'
@@ -71,7 +81,7 @@ export default function PagedTable({
 				<Table layout='fixed'>
 					<Thead>
 						<Tr>
-							{headers.map((header, index) => (
+							{headers.map((header: string, index: number) => (
 								<Th
 									key={index}
 								>
@@ -81,19 +91,19 @@ export default function PagedTable({
 						</Tr>
 					</Thead>
 					<Tbody>
-						{elements?.map((element, index) => {
+						{elements.map((element, index) => {
 							return (
 								<Tr
 									key={index}
-									_hover={onRowClick && {
+									_hover={onRowClick ? {
 										opacity: .7,
-									}}
+									} : undefined}
 									cursor={onRowClick ? 'pointer' : 'default'}
-									onClick={onRowClick ? () => onRowClick(element) : null}
+									onClick={onRowClick ? () => onRowClick(element) : undefined}
 								>
-									{fields.map((field, index) => (
+									{fields.map((field: string, fieldIndex: number) => (
 										<Td
-											key={index}
+											key={fieldIndex}
 											whiteSpace='normal'
 											overflowWrap='break-word'
 										>
@@ -101,7 +111,7 @@ export default function PagedTable({
 												? transforms[field](element[field])
 												: (typeof element[field] === 'boolean'
 													? conditionPill(element[field])
-													: element[field]
+													: String(element[field] ?? '')
 												)
 											}
 										</Td>

@@ -13,10 +13,12 @@ import { useTranslation } from 'react-i18next';
 import { callAPI, icons } from '../../../service';
 import { computeInsights } from '../../../service/stats';
 
-export default function GlobalInsights({ rawInsights, id }) {
-    const [projects, setProjects] = useState(null);
-    const [selected, setSelected] = useState(null);
-    const [accumulated, setAccumulated] = useState(null);
+import type { InsightBox } from '../../../types';
+
+export default function GlobalInsights({ rawInsights, id }: { rawInsights: InsightBox[]; id: string }) {
+    const [projects, setProjects] = useState<string[] | null>(null);
+    const [selected, setSelected] = useState<string[] | null>(null);
+    const [accumulated, setAccumulated] = useState<any>(null);
     const [edit, setEdit] = useState(false);
     const { t } = useTranslation();
 
@@ -33,7 +35,7 @@ export default function GlobalInsights({ rawInsights, id }) {
         return json.distinct;
     }
 
-    const getInsights = (selection) => {
+    const getInsights = (selection: string[]) => {
         return computeInsights(rawInsights, { grouped: false, only: selection });
     }
 
@@ -85,8 +87,8 @@ export default function GlobalInsights({ rawInsights, id }) {
                 padding={5}
             >
                 <CheckboxGroup
-                    value={selected}
-                    onChange={setSelected}
+                    value={selected ?? undefined}
+                    onChange={(value) => setSelected(value as string[])}
                 >
                     <Flex
                         wrap='wrap'
@@ -129,6 +131,7 @@ export default function GlobalInsights({ rawInsights, id }) {
             menu={
                 <Flex>
                     <IconButton
+                        aria-label="Toggle edit"
                         variant='outline'
                         icon={edit ? <icons.close /> : <icons.edit />}
                         onClick={() => setEdit((prev) => !prev)}
@@ -136,7 +139,7 @@ export default function GlobalInsights({ rawInsights, id }) {
                 </Flex>
             }
             insights={accumulated}
-            project={`${t('globalInsights')} (${selected.join(', ')})`}
+            project={`${t('globalInsights')} (${selected!.join(', ')})`}
         />
     )
 }

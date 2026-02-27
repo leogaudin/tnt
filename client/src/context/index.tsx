@@ -1,15 +1,22 @@
-import React, { createContext, useEffect, useState } from 'react';
+import React, { createContext, useEffect, useState, type ReactNode, type Dispatch, type SetStateAction } from 'react';
 import { callAPI, fetchInsights, user } from '../service';
+import type { InsightBox } from '../types';
 
-const AppContext = createContext({
-	rawInsights: [],
+interface AppContextType {
+	rawInsights: InsightBox[] | null;
+	language: string;
+	setLanguage: Dispatch<SetStateAction<string>>;
+}
+
+const AppContext = createContext<AppContextType>({
+	rawInsights: null,
 	language: 'en',
 	setLanguage: () => { },
 });
 
-export const AppProvider = ({ children }) => {
+export const AppProvider = ({ children }: { children: ReactNode }) => {
 	const [language, setLanguage] = useState('en');
-	const [rawInsights, setRawInsights] = useState(null);
+	const [rawInsights, setRawInsights] = useState<InsightBox[] | null>(null);
 
 	const initTnT = async () => {
 		const res = await callAPI('GET', 'auth/me')

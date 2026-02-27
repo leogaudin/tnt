@@ -2,7 +2,7 @@ import { Flex, Heading, Spinner } from '@chakra-ui/react';
 import { palette } from '../theme';
 import { useTranslation } from 'react-i18next';
 
-export default function BigLoading({ message }) {
+export default function BigLoading({ message }: { message?: string }) {
 	const { t } = useTranslation();
 
 	return (

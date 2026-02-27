@@ -1,52 +1,12 @@
-export type Progress = 'noScans' | 'inProgress' | 'reachedGps' | 'received' | 'reachedAndReceived' | 'validated';
-
-export interface Scan {
-	time: number;
-	finalDestination: boolean;
-	markedAsReceived: boolean;
-	[key: string]: any;
-}
-
-export interface StatusChange {
-	scan: string;
-	time: number;
-}
-
-export interface StatusChanges {
-	inProgress: StatusChange | null;
-	received: StatusChange | null;
-	reachedGps: StatusChange | null;
-	reachedAndReceived: StatusChange | null;
-	validated: StatusChange | null;
-}
-
-export interface Box {
-	scans: Scan[];
-	statusChanges: StatusChanges | null;
-	project: string;
-	progress: Progress;
-	content?: Record<string, number> | null;
-}
-
-interface Repartition extends Record<Progress, number> {
-	total: number;
-}
-
-interface ContentItem {
-	validated: number;
-	total: number;
-}
-
-interface Insights {
-	timeline: Array<{ name: string } & Repartition>;
-	repartition: Repartition;
-	content: Record<string, ContentItem>;
-}
-
-interface ComputeOptions {
-	grouped?: boolean;
-	only?: string[] | null;
-}
+import type {
+	Progress,
+	StatusChanges,
+	InsightBox,
+	Repartition,
+	ContentItem,
+	Insights,
+	ComputeOptions,
+} from '../types';
 
 const ORDERED_STATUSES = [
 	'inProgress',
@@ -57,17 +17,17 @@ const ORDERED_STATUSES = [
 ] as const satisfies readonly (keyof StatusChanges)[];
 
 export function getLastScanWithConditions(
-	scans: Scan[] | null | undefined,
+	scans: Array<{ time: number; [key: string]: unknown }> | null | undefined,
 	conditions: string[] = [],
-): Scan | null {
-	return (scans ?? []).reduce<Scan | null>((last, scan) => {
+): { time: number; [key: string]: unknown } | null {
+	return (scans ?? []).reduce<{ time: number; [key: string]: unknown } | null>((last, scan) => {
 		const matchesAll = conditions.every((cond) => scan[cond]);
 		if (matchesAll && scan.time > (last?.time ?? 0)) return scan;
 		return last;
 	}, null);
 }
 
-export function getProgress(box: Pick<Box, 'statusChanges'>, notAfterTimestamp = Date.now()): Progress {
+export function getProgress(box: Pick<InsightBox, 'statusChanges'>, notAfterTimestamp = Date.now()): Progress {
 	if (!box.statusChanges) return 'noScans';
 
 	const sc = box.statusChanges;
@@ -78,7 +38,7 @@ export function getProgress(box: Pick<Box, 'statusChanges'>, notAfterTimestamp =
 	}, 'noScans');
 }
 
-function sampleToRepartition(sample: Box[], notAfterTimestamp = Date.now()): Repartition {
+function sampleToRepartition(sample: InsightBox[], notAfterTimestamp = Date.now()): Repartition {
 	const repartition: Repartition = {
 		noScans: 0,
 		inProgress: 0,
@@ -105,7 +65,7 @@ function getMinMax(arr: number[]): { min: number; max: number } {
 	};
 }
 
-function sampleToTimeline(sample: Box[]) {
+function sampleToTimeline(sample: InsightBox[]) {
 	const allTimestamps = sample
 		.flatMap((box) =>
 			Object.values(box.statusChanges ?? {})
@@ -131,7 +91,7 @@ function sampleToTimeline(sample: Box[]) {
 	return data;
 }
 
-export function sampleToContent(sample: Box[]): Record<string, ContentItem> {
+export function sampleToContent(sample: InsightBox[]): Record<string, ContentItem> {
 	const content: Record<string, ContentItem> = {};
 
 	for (const box of sample) {
@@ -148,7 +108,7 @@ export function sampleToContent(sample: Box[]): Record<string, ContentItem> {
 }
 
 export function computeInsights(
-	boxes: Box[] | null,
+	boxes: InsightBox[] | null,
 	options: ComputeOptions = {},
 ): Record<string, Insights> | Insights | Record<string, never> {
 	const { grouped = true, only = null } = options;

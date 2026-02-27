@@ -7,6 +7,8 @@ import { palette } from '../theme';
 
 export default function BoxContent({
 	content,
+}: {
+	content: Record<string, number>;
 }) {
 	const { t } = useTranslation();
 
@@ -38,7 +40,7 @@ export default function BoxContent({
 							key={element}
 						>
 							<Heading>
-								{quantity}
+								{String(quantity)}
 							</Heading>
 							<Heading
 								size='sm'

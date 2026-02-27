@@ -24,6 +24,7 @@ export default function UploadModal({
 	return (
 		<Modal
 			isOpen={isOpen}
+			onClose={() => {}}
 			size='xl'
 		>
 			<ModalOverlay />
