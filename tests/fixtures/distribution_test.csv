@@ -1,0 +1,13 @@
+project,division,district,zone,school,htName,htPhone,schoolCode,schoolLatitude,schoolLongitude,books,pens
+TestProject,North,District A,Zone 1,Springfield Elementary,Seymour Skinner,+1555000001,SPR001,48.8566,2.3522,100,50
+TestProject,North,District A,Zone 1,Shelbyville Primary,Edna Krabappel,+1555000002,SHE002,48.8606,-2.3376,80,40
+TestProject,South,District B,Zone 2,Capital City School,Superintendent Chalmers,+1555000003,CAP003,40.7128,-74.0060,120,60
+TestProject,,District C,,Rural School,,,RUR004,51.5074,-0.1278,50,25
+TestProject,East,District D,Zone 3,Coastal Academy,Ms. Hoover,+1555000005,COA005,-33.8688,151.2093,90,45
+TestProject,West,District E,Zone 4,Mountain View School,Otto Mann,+1555000006,MOU006,35.6762,139.6503,110,55
+TestProject,North,District A,Zone 1,Equator School,Groundskeeper Willie,+1555000007,EQU007,0.0076,32.4796,70,35
+TestProject,,,,Missing Required Fields,,,,48.8566,2.3522,10,5
+TestProject,North,District F,Zone 5,No Coords School,Lunchlady Doris,+1555000009,NOC009,,,,
+TestProject,South,District G,Zone 6,Bad Coords School,Hans Moleman,+1555000010,BAD010,not_a_number,also_not,60,30
+TestProject,North,District H,Zone 7,Comma Decimals School,Ned Flanders,+1555000011,COM011,"48,8566","2,3522",85,42
+TestProject,East,District I,Zone 8,Southern Hemisphere School,Apu Nahasapeemapetilon,+1555000012,SOU012,-22.9068,-43.1729,95,48
