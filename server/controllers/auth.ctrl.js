@@ -59,7 +59,7 @@ router.post('/register', async (req, res) => {
 
 router.get('/me', async (req, res) => {
 	try {
-		requireApiKey(req, req, (admin) => {
+		requireApiKey(req, res, (admin) => {
 			return handle200Success(res, admin);
 		})
 	} catch (err) {
