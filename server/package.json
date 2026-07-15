@@ -3,7 +3,7 @@
 	"version": "1.0.0",
 	"main": "index.js",
 	"scripts": {
-		"start": "babel-node index.js",
+		"start": "node index.js",
 		"dev": "nodemon --exec babel-node index.js",
 		"deploy": "pm2 start pm2.config.cjs --env production"
 	},
