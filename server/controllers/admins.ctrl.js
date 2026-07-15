@@ -11,6 +11,21 @@ import {
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * /admin:
+ *   post:
+ *     summary: Create an admin directly (raw insert, no API key generated)
+ *     tags: [Admins]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Admin'
+ *     responses:
+ *       200: { description: Admin created }
+ */
 router.post('/admin', createOne(Admin));
 // router.post('/admins', createMany(Admin));
 // router.delete('/admin/:id', deleteOne(Admin));

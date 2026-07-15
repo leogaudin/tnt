@@ -8,7 +8,23 @@ import { requireApiKey } from '../service/apiKey.js';
 const router = express.Router();
 
 /**
- * @description	Retrieve all scans for the provided filters
+ * @swagger
+ * /scan/query:
+ *   post:
+ *     summary: Retrieve all scans for the authenticated admin matching the provided filters
+ *     tags: [Scans]
+ *     security: [{ apiKeyAuth: [] }]
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               skip: { type: integer }
+ *               limit: { type: integer }
+ *               filters: { type: object }
+ *     responses:
+ *       200: { description: Matching scans }
  */
 router.post('/scan/query', async (req, res) => {
 	try {
@@ -30,7 +46,21 @@ router.post('/scan/query', async (req, res) => {
 });
 
 /**
- * @description	Retrieve the count of scans for the provided filters
+ * @swagger
+ * /scan/count:
+ *   post:
+ *     summary: Retrieve the count of scans for the authenticated admin matching the provided filters
+ *     tags: [Scans]
+ *     security: [{ apiKeyAuth: [] }]
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               filters: { type: object }
+ *     responses:
+ *       200: { description: Scan count }
  */
 router.post('/scan/count', async (req, res) => {
 	try {
@@ -45,6 +75,16 @@ router.post('/scan/count', async (req, res) => {
 	}
 });
 
+/**
+ * @swagger
+ * /scans/count:
+ *   get:
+ *     summary: Count scans for the authenticated admin, filtered by any query params
+ *     tags: [Scans]
+ *     security: [{ apiKeyAuth: [] }]
+ *     responses:
+ *       200: { description: Scan count }
+ */
 router.get('/scans/count', async (req, res) => {
 	try {
 		requireApiKey(req, res, async (admin) => {
@@ -57,6 +97,24 @@ router.get('/scans/count', async (req, res) => {
 	}
 });
 
+/**
+ * @swagger
+ * /scans:
+ *   get:
+ *     summary: List scans for the authenticated admin, filtered by any query params
+ *     tags: [Scans]
+ *     security: [{ apiKeyAuth: [] }]
+ *     parameters:
+ *       - in: query
+ *         name: skip
+ *         schema: { type: integer }
+ *       - in: query
+ *         name: limit
+ *         schema: { type: integer }
+ *     responses:
+ *       200: { description: Matching scans, newest first }
+ *       404: { description: No scans available }
+ */
 router.get('/scans', async (req, res) => {
 	try {
 		const skip = parseInt(req.query.skip);
@@ -87,6 +145,23 @@ router.get('/scans', async (req, res) => {
 	}
 });
 
+/**
+ * @swagger
+ * /scans:
+ *   post:
+ *     summary: List scans for the authenticated admin matching a raw filter
+ *     tags: [Scans]
+ *     security: [{ apiKeyAuth: [] }]
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               filters: { type: object }
+ *     responses:
+ *       200: { description: Matching scans }
+ */
 router.post('/scans', async (req, res) => {
 	try {
 		requireApiKey(req, res, async (admin) => {
@@ -102,6 +177,23 @@ router.post('/scans', async (req, res) => {
 	}
 });
 
+/**
+ * @swagger
+ * /box/{id}/scans:
+ *   get:
+ *     summary: List all scans for a box, scoped to the authenticated admin
+ *     tags: [Scans]
+ *     security: [{ apiKeyAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Scans for this box }
+ *       401: { description: Box does not belong to this admin }
+ *       404: { description: Box not found }
+ */
 router.get('/box/:id/scans', async (req, res) => {
 	try {
 		const { id } = req.params;
@@ -129,6 +221,37 @@ router.get('/box/:id/scans', async (req, res) => {
 	}
 });
 
+/**
+ * @swagger
+ * /scan:
+ *   post:
+ *     summary: Record a new scan for a box and update its status progression
+ *     tags: [Scans]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [boxId, operatorId, location]
+ *             properties:
+ *               boxId: { type: string }
+ *               comment: { type: string }
+ *               operatorId: { type: string }
+ *               location:
+ *                 type: object
+ *                 properties:
+ *                   coords:
+ *                     type: object
+ *                     properties:
+ *                       latitude: { type: number }
+ *                       longitude: { type: number }
+ *                       accuracy: { type: number }
+ *               markedAsReceived: { type: boolean }
+ *     responses:
+ *       200: { description: Scan added successfully }
+ *       404: { description: Box not found }
+ */
 router.post('/scan', async (req, res) => {
 	try {
 		const { boxId, comment, operatorId, time, location, markedAsReceived } = req.body;

@@ -6,6 +6,18 @@ import { handle200Success } from '../service/errorHandlers.js';
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * /toggle_insights:
+ *   post:
+ *     summary: Toggle whether the authenticated admin's insights are public
+ *     tags: [Insights]
+ *     security: [{ apiKeyAuth: [] }]
+ *     responses:
+ *       200: { description: New publicInsights value }
+ *       401: { description: Missing API key }
+ *       404: { description: Admin not found }
+ */
 router.post('/toggle_insights', async (req, res) => {
 	try {
 		const apiKey = req.headers['x-authorization'];
@@ -27,6 +39,21 @@ router.post('/toggle_insights', async (req, res) => {
 	}
 });
 
+/**
+ * @swagger
+ * /is_public/{id}:
+ *   get:
+ *     summary: Check whether an admin's insights are public
+ *     tags: [Insights]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: publicInsights value for this admin }
+ *       404: { description: Admin not found }
+ */
 router.get('/is_public/:id', async (req, res) => {
 	try {
 		const { id } = req.params;
@@ -42,6 +69,23 @@ router.get('/is_public/:id', async (req, res) => {
 	}
 });
 
+/**
+ * @swagger
+ * /projects/{id}:
+ *   get:
+ *     summary: List distinct project names for an admin's boxes
+ *     description: Requires an API key unless the admin has publicInsights enabled.
+ *     tags: [Insights]
+ *     security: [{ apiKeyAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: List of distinct project names }
+ *       404: { description: Admin not found }
+ */
 router.get('/projects/:id', async (req, res) => {
 	const { id } = req.params;
 	const user = await Admin.findOne({ id });

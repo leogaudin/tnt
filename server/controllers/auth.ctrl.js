@@ -6,6 +6,28 @@ import { handle200Success } from '../service/errorHandlers.js';
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * /login:
+ *   post:
+ *     summary: Log in an admin
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [username, password]
+ *             properties:
+ *               username: { type: string, description: Admin email }
+ *               password: { type: string }
+ *     responses:
+ *       200: { description: Logged in, returns the admin }
+ *       400: { description: Missing username or password }
+ *       401: { description: Invalid password }
+ *       404: { description: No user with this username }
+ */
 router.post('/login', async (req, res) => {
 	try {
 		const { username, password } = req.body;
@@ -26,6 +48,27 @@ router.post('/login', async (req, res) => {
 	}
 });
 
+/**
+ * @swagger
+ * /register:
+ *   post:
+ *     summary: Register a new admin and receive an API key
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [username, password]
+ *             properties:
+ *               username: { type: string, description: Admin email }
+ *               password: { type: string }
+ *     responses:
+ *       201: { description: Admin created, returns the admin including apiKey }
+ *       400: { description: Missing username or password }
+ *       409: { description: User with this email already exists }
+ */
 router.post('/register', async (req, res) => {
 	try {
 		const { username, password } = req.body;
@@ -57,6 +100,17 @@ router.post('/register', async (req, res) => {
 	}
 });
 
+/**
+ * @swagger
+ * /me:
+ *   get:
+ *     summary: Get the authenticated admin
+ *     tags: [Auth]
+ *     security: [{ apiKeyAuth: [] }]
+ *     responses:
+ *       200: { description: The authenticated admin }
+ *       401: { description: Missing or invalid API key }
+ */
 router.get('/me', async (req, res) => {
 	try {
 		requireApiKey(req, res, (admin) => {

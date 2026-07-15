@@ -3,6 +3,8 @@ import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import compression from 'compression';
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from './swagger.js';
 
 import boxesController from './controllers/boxes.ctrl.js';
 import scansController from './controllers/scans.ctrl.js';
@@ -52,6 +54,8 @@ app.use(bodyParser.json({ limit: payloadLimit }));
 app.get('/', (req, res) => {
 	res.send('Hello World!');
 });
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use('/api', boxesController);
 app.use('/api', scansController);

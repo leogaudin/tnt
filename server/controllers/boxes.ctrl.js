@@ -16,15 +16,90 @@ import { indexStatusChanges } from '../service/stats.js';
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * /box:
+ *   post:
+ *     summary: Create a single box
+ *     tags: [Boxes]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Box'
+ *     responses:
+ *       200: { description: Box created }
+ */
 router.post('/box', createOne(Box));
+
+/**
+ * @swagger
+ * /boxes:
+ *   post:
+ *     summary: Create many boxes
+ *     tags: [Boxes]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: array
+ *             items:
+ *               $ref: '#/components/schemas/Box'
+ *     responses:
+ *       200: { description: Boxes created }
+ */
 router.post('/boxes', createMany(Box));
+
+/**
+ * @swagger
+ * /box/{id}:
+ *   delete:
+ *     summary: Delete a box by id
+ *     tags: [Boxes]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Box deleted }
+ */
 router.delete('/box/:id', deleteOne(Box));
+
+/**
+ * @swagger
+ * /boxes:
+ *   delete:
+ *     summary: Delete many boxes matching a filter
+ *     tags: [Boxes]
+ *     responses:
+ *       200: { description: Boxes deleted }
+ */
 router.delete('/boxes', deleteMany(Box))
 // router.get('/box/:id', getById(Box));
 // router.get('/boxes', getAll(Box));
 
 /**
- * @description	Retrieve all boxes for the provided filters
+ * @swagger
+ * /boxes/query:
+ *   post:
+ *     summary: Retrieve all boxes for the authenticated admin matching the provided filters
+ *     tags: [Boxes]
+ *     security: [{ apiKeyAuth: [] }]
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               skip: { type: integer }
+ *               limit: { type: integer }
+ *               filters: { type: object }
+ *     responses:
+ *       200: { description: Matching boxes }
+ *       404: { description: No boxes available }
  */
 router.post('/boxes/query', async (req, res) => {
 	try {
@@ -55,7 +130,21 @@ router.post('/boxes/query', async (req, res) => {
 });
 
 /**
- * @description	Retrieve the count of boxes for the provided filters
+ * @swagger
+ * /boxes/count:
+ *   post:
+ *     summary: Retrieve the count of boxes for the authenticated admin matching the provided filters
+ *     tags: [Boxes]
+ *     security: [{ apiKeyAuth: [] }]
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               filters: { type: object }
+ *     responses:
+ *       200: { description: Box count }
  */
 router.post('/boxes/count', async (req, res) => {
 	try {
@@ -70,6 +159,22 @@ router.post('/boxes/count', async (req, res) => {
 	}
 });
 
+/**
+ * @swagger
+ * /box/{id}:
+ *   get:
+ *     summary: Get a box by id, scoped to the authenticated admin
+ *     tags: [Boxes]
+ *     security: [{ apiKeyAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: The box }
+ *       404: { description: Box not found }
+ */
 router.get('/box/:id', async (req, res) => {
 	try {
 		requireApiKey(req, res, async (admin) => {
@@ -86,6 +191,30 @@ router.get('/box/:id', async (req, res) => {
 	}
 });
 
+/**
+ * @swagger
+ * /boxes/{adminId}:
+ *   get:
+ *     summary: List boxes for an admin
+ *     description: Returns a reduced projection (statusChanges + project only) with no auth if the admin has publicInsights enabled; otherwise requires the admin's own API key.
+ *     tags: [Boxes]
+ *     security: [{ apiKeyAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: adminId
+ *         required: true
+ *         schema: { type: string }
+ *       - in: query
+ *         name: skip
+ *         schema: { type: integer }
+ *       - in: query
+ *         name: limit
+ *         schema: { type: integer }
+ *     responses:
+ *       200: { description: Boxes for this admin }
+ *       401: { description: API key does not match this adminId }
+ *       404: { description: Admin not found or no boxes available }
+ */
 router.get('/boxes/:adminId', async (req, res) => {
 	try {
 		const found = await Admin.findOne({ id: req.params.adminId });
@@ -126,6 +255,33 @@ router.get('/boxes/:adminId', async (req, res) => {
 	}
 });
 
+/**
+ * @swagger
+ * /boxes/coords:
+ *   post:
+ *     summary: Bulk-update school coordinates for matching boxes and recalculate affected scans
+ *     tags: [Boxes]
+ *     security: [{ apiKeyAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [coords]
+ *             properties:
+ *               coords:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     school: { type: string }
+ *                     district: { type: string }
+ *                     schoolLatitude: { type: number }
+ *                     schoolLongitude: { type: number }
+ *     responses:
+ *       200: { description: Counts of boxes updated/matched and scans recalculated }
+ */
 router.post('/boxes/coords', async (req, res) => {
 	try {
 		requireApiKey(req, res, async (admin) => {
@@ -203,6 +359,17 @@ router.post('/boxes/coords', async (req, res) => {
 	}
 });
 
+/**
+ * @swagger
+ * /boxes/reindex:
+ *   post:
+ *     summary: Recompute statusChanges/progress indexing for all of the authenticated admin's boxes
+ *     tags: [Boxes]
+ *     security: [{ apiKeyAuth: [] }]
+ *     responses:
+ *       200: { description: Number of boxes reindexed }
+ *       404: { description: No boxes available }
+ */
 router.post('/boxes/reindex', async (req, res) => {
 	try {
 		requireApiKey(req, res, async (admin) => {
@@ -228,6 +395,17 @@ router.post('/boxes/reindex', async (req, res) => {
 	}
 });
 
+/**
+ * @swagger
+ * /boxes/recalculate:
+ *   post:
+ *     summary: Recalculate finalDestination for all scans and reindex boxes for the authenticated admin
+ *     tags: [Boxes]
+ *     security: [{ apiKeyAuth: [] }]
+ *     responses:
+ *       200: { description: Number of scans recalculated and boxes reindexed }
+ *       404: { description: No boxes available }
+ */
 router.post('/boxes/recalculate', async (req, res) => {
 	try {
 		requireApiKey(req, res, async (admin) => {
