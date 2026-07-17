@@ -31,7 +31,7 @@ database.once('connected', () => {
 
 const app = express();
 app.disable('x-powered-by');
-const apiPort = 3000;
+const apiPort = process.env.PORT || 3000;
 const payloadLimit = '4.5mb';
 
 app.use(compression({
