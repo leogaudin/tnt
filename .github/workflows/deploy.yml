@@ -72,7 +72,7 @@ jobs:
   # ──────────────────────────── DEPLOY → DEV ─────────────────────────────
   deploy-dev:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, galaxy-backbone]
     environment: dev
     permissions:
       contents: read
@@ -88,42 +88,26 @@ jobs:
             echo "services:"
             echo "  ${{env.SERVICE_NAME}}:"
             echo "    image: ${{ env.IMAGE_BASE }}@${{ needs.build.outputs.image_digest }}"
-          } > docker-compose.override.yml
-          cat docker-compose.override.yml
-
-      - name: Copy override to server
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host:     ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key:      ${{ secrets.SSH_KEY }}
-          source:   "docker-compose.override.yml"
-          target:   ${{ env.REMOTE_DIR }}
-          overwrite: true
+          } > "$REMOTE_DIR/docker-compose.override.yml"
+          cat "$REMOTE_DIR/docker-compose.override.yml"
 
       - name: Deploy ${{env.SERVICE_NAME}}
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host:     ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key:      ${{ secrets.SSH_KEY }}
-          envs: REMOTE_DIR
-          script: |
-            set -euo pipefail
+        run: |
+          set -euo pipefail
 
-            # Log in to GitHub Container Registry on the host
-            echo '${{ secrets.GHCR_PAT }}' | docker login -u '${{ github.repository_owner }}' --password-stdin "${{ env.REGISTRY }}"
+          # Log in to GitHub Container Registry (runs directly on the target box)
+          echo '${{ secrets.GHCR_PAT }}' | docker login -u '${{ github.repository_owner }}' --password-stdin "${{ env.REGISTRY }}"
 
-            docker compose \
-              --env-file "$REMOTE_DIR/.env" \
-              -f "$REMOTE_DIR/docker-compose.yml" \
-              -f "$REMOTE_DIR/docker-compose.override.yml" \
-              pull ${{env.SERVICE_NAME}}
+          docker compose \
+            --env-file "$REMOTE_DIR/.env" \
+            -f "$REMOTE_DIR/docker-compose.yml" \
+            -f "$REMOTE_DIR/docker-compose.override.yml" \
+            pull ${{env.SERVICE_NAME}}
 
-            docker compose \
-              --env-file "$REMOTE_DIR/.env" \
-              -f "$REMOTE_DIR/docker-compose.yml" \
-              -f "$REMOTE_DIR/docker-compose.override.yml" \
-              up -d --wait --wait-timeout 180 ${{env.SERVICE_NAME}}
+          docker compose \
+            --env-file "$REMOTE_DIR/.env" \
+            -f "$REMOTE_DIR/docker-compose.yml" \
+            -f "$REMOTE_DIR/docker-compose.override.yml" \
+            up -d --wait --wait-timeout 180 ${{env.SERVICE_NAME}}
 
-            docker image prune -f
+          docker image prune -f
