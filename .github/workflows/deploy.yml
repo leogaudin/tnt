@@ -1,0 +1,113 @@
+name: Build + Deploy dev
+
+on:
+  push:
+    branches: [ "main" ]
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  IMAGE_BASE: ghcr.io/${{ github.repository_owner }}/tnt-server
+  SERVICE_NAME: tnt-server
+
+jobs:
+  # ───────────────────────────── BUILD & PUSH ─────────────────────────────
+  build:
+    runs-on: ubuntu-latest
+    environment: dev
+    permissions:
+      contents: read
+      packages: write
+
+    outputs:
+      image_digest: ${{ steps.bp.outputs.digest }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Docker login → GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx (BuildKit)
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver: docker-container
+          install: true
+
+      - name: Docker meta (tags + labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_BASE }}
+          tags: |
+            type=raw,value=main
+            type=sha
+          labels: |
+            org.opencontainers.image.source=${{ github.repository }}
+
+      - name: Build & Push
+        id: bp
+        uses: docker/build-push-action@v6
+        with:
+          context: ./server
+          push: true
+          platforms: linux/amd64
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Write image digest to workflow summary
+        run: |
+          echo "### Built image digest" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "\`${{ env.IMAGE_BASE }}@${{ steps.bp.outputs.digest }}\`" >> "$GITHUB_STEP_SUMMARY"
+
+  # ──────────────────────────── DEPLOY → DEV ─────────────────────────────
+  deploy-dev:
+    needs: build
+    runs-on: [self-hosted, galaxy-backbone]
+    environment: dev
+    permissions:
+      contents: read
+
+    env:
+      REGISTRY: ghcr.io
+      REMOTE_DIR: /opt/stack/tnt-server
+
+    steps:
+      - name: Create per-app digest override
+        run: |
+          {
+            echo "services:"
+            echo "  ${{env.SERVICE_NAME}}:"
+            echo "    image: ${{ env.IMAGE_BASE }}@${{ needs.build.outputs.image_digest }}"
+          } > "$REMOTE_DIR/docker-compose.override.yml"
+          cat "$REMOTE_DIR/docker-compose.override.yml"
+
+      - name: Deploy ${{env.SERVICE_NAME}}
+        run: |
+          set -euo pipefail
+
+          # Log in to GitHub Container Registry (runs directly on the target box)
+          echo '${{ secrets.GHCR_PAT }}' | docker login -u '${{ github.repository_owner }}' --password-stdin "${{ env.REGISTRY }}"
+
+          docker compose \
+            --env-file "$REMOTE_DIR/.env" \
+            -f "$REMOTE_DIR/docker-compose.yml" \
+            -f "$REMOTE_DIR/docker-compose.override.yml" \
+            pull ${{env.SERVICE_NAME}}
+
+          docker compose \
+            --env-file "$REMOTE_DIR/.env" \
+            -f "$REMOTE_DIR/docker-compose.yml" \
+            -f "$REMOTE_DIR/docker-compose.override.yml" \
+            up -d --wait --wait-timeout 180 ${{env.SERVICE_NAME}}
+
+          docker image prune -f
