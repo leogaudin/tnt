@@ -659,3 +659,41 @@ specific requirements.
 if any, to sign a "copyright disclaimer" for the program, if necessary.
 For more information on this, and how to apply and follow the GNU AGPL, see
 <https://www.gnu.org/licenses/>.
+
+===============================================================================
+
+              ADDITIONAL TERMS UNDER GNU AGPL VERSION 3 SECTION 7
+
+===============================================================================
+
+Copyright (C) 2024-2026 Leo Gaudin
+
+The following additional term applies to this program, as expressly permitted
+by section 7(b) of the GNU Affero General Public License version 3, which
+allows supplementing the License with terms "requiring preservation of
+specified reasonable legal notices or author attributions in that material or
+in the Appropriate Legal Notices displayed by works containing it".
+
+  ATTRIBUTION NOTICE
+
+  If you convey a modified version of this program, or make it available to
+  users over a computer network, you must preserve the following attribution
+  notice in the Appropriate Legal Notices displayed by the work:
+
+      Powered by TnT (Track-and-Trace)
+      https://github.com/leogaudin/tnt
+
+  This notice must be visible to users during normal use of the interface,
+  for example in a footer, an "About" page, a login screen, or an equivalent
+  location. The notice may be restyled to match the surrounding interface,
+  and may be translated, provided that it remains legible, is not hidden or
+  obscured, and that the URL remains present and functional.
+
+  Being a term permitted under section 7(b), this requirement is not a
+  "further restriction" within the meaning of section 10, and it must be
+  preserved when the covered work is conveyed onward.
+
+  This term supplements and does not replace any other requirement of the
+  GNU Affero General Public License, including the obligation under
+  section 13 to offer the Corresponding Source of a modified version to
+  users interacting with it over a computer network.
