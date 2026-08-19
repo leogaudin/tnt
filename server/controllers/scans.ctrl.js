@@ -19,7 +19,12 @@ router.post('/scan/query', async (req, res) => {
 								.find({ ...filters, adminId: admin.id })
 								.skip(skip)
 								.limit(limit)
-								// .sort({ time: -1 });
+								// The sort was previously commented out, leaving this paginated
+								// query unordered — see the note in boxes.ctrl.js. `time` alone
+								// is not unique (scans share timestamps) and a non-unique key
+								// lets MongoDB order ties differently per query, so `_id` is
+								// appended to make the order total.
+								.sort({ time: -1, _id: 1 });
 
 			return res.status(200).json({ scans });
 		});
@@ -74,7 +79,10 @@ router.get('/scans', async (req, res) => {
 								.find(filters)
 								.skip(skip)
 								.limit(limit)
-								.sort({ time: -1 });
+								// `_id` appended: `time` is not unique, and pagination over a
+								// non-unique sort key can repeat/skip documents at page
+								// boundaries. See the note in boxes.ctrl.js.
+								.sort({ time: -1, _id: 1 });
 
 			if (!scans.length)
 				return res.status(404).json({ success: false, error: `No scans available` });

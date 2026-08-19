@@ -82,8 +82,25 @@ export async function fetchBoxes(filters = []) {
 				{ filters: filters.reduce((acc, { field, value }) => ({ ...acc, [field]: value }), {}) }
 			);
 
-			if (request.status !== 200 || !request.ok)
+			// 404 is the server's benign "nothing on this page" — the normal end of
+			// data, so stop the loop.
+			if (request.status === 404)
 				break;
+
+			// Any other non-2xx must NOT be swallowed: silently breaking here
+			// returns a partial set that looks complete and yields a truncated
+			// result. Throw so the failure surfaces instead.
+			if (!request.ok) {
+				let detail = '';
+				try {
+					const errJson = await request.json();
+					if (errJson?.error)
+						detail = `: ${typeof errJson.error === 'string' ? errJson.error : JSON.stringify(errJson.error)}`;
+				} catch {
+					// response body was not JSON; ignore
+				}
+				throw new Error(`Failed to fetch boxes at skip=${skip} (status ${request.status})${detail}`);
+			}
 
 			const response = await request.json();
 
@@ -128,8 +145,25 @@ export async function fetchScans(filters = {}) {
 				{ filters }
 			);
 
-			if (request.status !== 200 || !request.ok)
+			// 404 is the server's benign "nothing on this page" — the normal end of
+			// data, so stop the loop.
+			if (request.status === 404)
 				break;
+
+			// Any other non-2xx must NOT be swallowed: silently breaking here
+			// returns a partial set that looks complete and yields a truncated
+			// result. Throw so the failure surfaces instead.
+			if (!request.ok) {
+				let detail = '';
+				try {
+					const errJson = await request.json();
+					if (errJson?.error)
+						detail = `: ${typeof errJson.error === 'string' ? errJson.error : JSON.stringify(errJson.error)}`;
+				} catch {
+					// response body was not JSON; ignore
+				}
+				throw new Error(`Failed to fetch scans at skip=${skip} (status ${request.status})${detail}`);
+			}
 
 			const response = await request.json();
 
@@ -163,8 +197,25 @@ export async function fetchAllBoxes(id, setBoxes) {
 
 			const request = await callAPI('GET', `boxes/${id}?skip=${skip}&limit=${BUFFER_LENGTH}`);
 
-			if (request.status !== 200 || !request.ok)
+			// 404 is the server's benign "nothing on this page" — the normal end of
+			// data, so stop the loop.
+			if (request.status === 404)
 				break;
+
+			// Any other non-2xx must NOT be swallowed: silently breaking here
+			// returns a partial set that looks complete and yields a truncated
+			// result. Throw so the failure surfaces instead.
+			if (!request.ok) {
+				let detail = '';
+				try {
+					const errJson = await request.json();
+					if (errJson?.error)
+						detail = `: ${typeof errJson.error === 'string' ? errJson.error : JSON.stringify(errJson.error)}`;
+				} catch {
+					// response body was not JSON; ignore
+				}
+				throw new Error(`Failed to fetch boxes at skip=${skip} (status ${request.status})${detail}`);
+			}
 
 			const response = await request.json();
 
@@ -191,8 +242,25 @@ export async function fetchAllScans() {
 
 			const request = await callAPI('GET', `scans?skip=${skip}&limit=${BUFFER_LENGTH}`);
 
-			if (request.status !== 200 || !request.ok)
+			// 404 is the server's benign "nothing on this page" — the normal end of
+			// data, so stop the loop.
+			if (request.status === 404)
 				break;
+
+			// Any other non-2xx must NOT be swallowed: silently breaking here
+			// returns a partial set that looks complete and yields a truncated
+			// result. Throw so the failure surfaces instead.
+			if (!request.ok) {
+				let detail = '';
+				try {
+					const errJson = await request.json();
+					if (errJson?.error)
+						detail = `: ${typeof errJson.error === 'string' ? errJson.error : JSON.stringify(errJson.error)}`;
+				} catch {
+					// response body was not JSON; ignore
+				}
+				throw new Error(`Failed to fetch scans at skip=${skip} (status ${request.status})${detail}`);
+			}
 
 			const response = await request.json();
 

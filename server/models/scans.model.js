@@ -15,4 +15,11 @@ const Scan = new Schema(
 	}
 )
 
+// Serves the paginated scan queries: adminId equality + (time desc, _id asc)
+// ordering straight from the index, so no blocking in-memory sort.
+Scan.index({ adminId: 1, time: -1, _id: 1 });
+// Serves per-box scan lookups (scan/box/:id, BoxCard) and the { boxId: { $in } }
+// bulk reads, which otherwise scan the whole (fast-growing) scans collection.
+Scan.index({ boxId: 1 });
+
 export default mongoose.model('scans', Scan);

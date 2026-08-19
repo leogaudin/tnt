@@ -40,8 +40,19 @@ router.post('/boxes/query', async (req, res) => {
 					{ ...filters, adminId: admin.id },
 					{ scans: 0 },
 				)
+				// `_id` gives the query a stable TOTAL order. skip/limit pagination
+				// is only correct over a stable sort: unsorted results have no
+				// ordering guarantee, so the separate per-page queries can disagree
+				// on the order — pages then overlap and other documents are never
+				// returned, silently dropping rows from exports. `_id` is unique, so
+				// ties are impossible and every page is disjoint.
+				.sort({ _id: 1 })
 				.skip(skip)
-				.limit(limit);
+				.limit(limit)
+				// Defense-in-depth: if the sort ever can't be served by an index,
+				// let it spill to disk instead of throwing the blocking-sort memory
+				// error (100MB on MongoDB 4.4+) mid-pagination.
+				.allowDiskUse(true);
 
 			if (!boxes.length)
 				return res.status(404).json({ error: `No boxes available` });
@@ -93,7 +104,9 @@ router.get('/boxes/:adminId', async (req, res) => {
 			return res.status(404).json({ success: false, error: `Admin not found` });
 
 		if (found.publicInsights && !req.headers['x-authorization']) {
-			const boxes = await Box.find({ adminId: req.params.adminId }, 'statusChanges project').skip(parseInt(req.query.skip)).limit(parseInt(req.query.limit));
+			// .sort({ _id: 1 }): stable total order, required for skip/limit to
+			// paginate without overlapping/omitting documents.
+			const boxes = await Box.find({ adminId: req.params.adminId }, 'statusChanges project').sort({ _id: 1 }).skip(parseInt(req.query.skip)).limit(parseInt(req.query.limit));
 
 			if (!boxes.length)
 				return res.status(404).json({ success: false, error: `No boxes available` });
@@ -113,7 +126,9 @@ router.get('/boxes/:adminId', async (req, res) => {
 			if (admin.id !== req.params.adminId)
 				return res.status(401).json({ success: false, error: `Unauthorized` });
 
-			const boxes = await Box.find({ adminId: req.params.adminId }, { scans: 0 }).skip(parseInt(req.query.skip)).limit(parseInt(req.query.limit));
+			// .sort({ _id: 1 }): stable total order, required for skip/limit to
+			// paginate without overlapping/omitting documents.
+			const boxes = await Box.find({ adminId: req.params.adminId }, { scans: 0 }).sort({ _id: 1 }).skip(parseInt(req.query.skip)).limit(parseInt(req.query.limit));
 
 			if (!boxes.length)
 				return res.status(404).json({ success: false, error: `No boxes available` });

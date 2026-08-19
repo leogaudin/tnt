@@ -29,4 +29,14 @@ const Box = new Schema(
 	}
 )
 
+// Serves every paginated boxes path (boxes/query, boxes/:adminId): adminId
+// equality + _id ordering straight from the index, so the pagination sort is
+// never a blocking in-memory sort (capped at 100MB on MongoDB 4.4+).
+Box.index({ adminId: 1, _id: 1 });
+// Box.findOne({ id }) runs on every scan submission. The app-level `id` is
+// otherwise unindexed, forcing a full collection scan per scan write — costly
+// during bulk offline-sync replay. Left non-unique to avoid a build failure if
+// any duplicate ids already exist.
+Box.index({ id: 1 });
+
 export default mongoose.model('boxes', Box);
