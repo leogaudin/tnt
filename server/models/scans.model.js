@@ -25,7 +25,11 @@ const Scan = new Schema(
 // allowDiskUse true/false/unset all throw identically). The pre-existing
 // sort({ time: -1 }) was already blocking-sorting right at that boundary, so
 // this index also fixes a latent failure rather than only enabling the new key.
-Scan.index({ adminId: 1, time: -1, _id: 1 });
+// Ascending on purpose: a uniform-direction sort is served by traversing this
+// index forwards ({ time: 1, _id: 1 }) or backwards ({ time: -1, _id: -1 }), so
+// one index covers both directions and this declaration matches the index
+// already built by hand on the clusters rather than creating a second one.
+Scan.index({ adminId: 1, time: 1, _id: 1 });
 // Serves per-box scan lookups (scan/box/:id, BoxCard) and the { boxId: { $in } }
 // bulk reads, which otherwise scan the whole (fast-growing) scans collection.
 Scan.index({ boxId: 1 });

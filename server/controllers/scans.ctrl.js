@@ -87,7 +87,15 @@ router.get('/scans', async (req, res) => {
 								// `_id` appended: `time` is not unique, and pagination over a
 								// non-unique sort key can repeat/skip documents at page
 								// boundaries. See the note in boxes.ctrl.js.
-								.sort({ time: -1, _id: 1 });
+								//
+								// `_id: -1`, not 1 — the directions must be UNIFORM. Verified
+								// against production: { time: -1, _id: 1 } is mixed relative to
+								// any single index and forces a blocking sort (5.0s, and it
+								// throws outright without a backing index), while
+								// { time: -1, _id: -1 } is served by traversing
+								// { adminId, time, _id } backwards (1.7s) — and works whichever
+								// direction that index was created in.
+								.sort({ time: -1, _id: -1 });
 
 			if (!scans.length)
 				return res.status(404).json({ success: false, error: `No scans available` });
