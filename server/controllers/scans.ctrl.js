@@ -20,11 +20,16 @@ router.post('/scan/query', async (req, res) => {
 								.skip(skip)
 								.limit(limit)
 								// The sort was previously commented out, leaving this paginated
-								// query unordered — see the note in boxes.ctrl.js. `time` alone
-								// is not unique (scans share timestamps) and a non-unique key
-								// lets MongoDB order ties differently per query, so `_id` is
-								// appended to make the order total.
-								.sort({ time: -1, _id: 1 });
+								// query unordered — see the note in boxes.ctrl.js. Sorting by
+								// `_id` alone (rather than time desc + _id) is deliberate: the
+								// only consumer is fetchScans, which indexes the result by boxId
+								// and does not care about order, and `_id` is served by the
+								// default _id_ index on every cluster. Verified against
+								// production: { time: -1, _id: 1 } here needs a blocking sort and
+								// throws QueryExceededMemoryLimitNoDiskUseAllowed past ~50k skip
+								// on the 940k-document scans collection (32MB cap, and
+								// allowDiskUse is ignored on these Atlas tiers).
+								.sort({ _id: 1 });
 
 			return res.status(200).json({ scans });
 		});
