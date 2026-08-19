@@ -31,7 +31,11 @@ const Box = new Schema(
 
 // Serves every paginated boxes path (boxes/query, boxes/:adminId): adminId
 // equality + _id ordering straight from the index, so the pagination sort is
-// never a blocking in-memory sort (capped at 100MB on MongoDB 4.4+).
+// never a blocking in-memory sort (capped at 32MB on these Atlas tiers).
+// Not required for correctness: sort({ _id: 1 }) is already served by the
+// default _id_ index (verified by explain against production), so the fix is
+// safe to deploy before this index finishes building. It only avoids scanning
+// the whole collection instead of one admin's slice.
 Box.index({ adminId: 1, _id: 1 });
 // Box.findOne({ id }) runs on every scan submission. The app-level `id` is
 // otherwise unindexed, forcing a full collection scan per scan write — costly
