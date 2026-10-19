@@ -23,7 +23,13 @@ export default defineConfig({
 			}).map(([find, replacement]) => ({ find, replacement })),
 		],
 	},
+	// The client's font imports (`?url`) live outside this folder; newer Vite versions refuse them unless allowed.
+	server: { fs: { allow: [path.resolve(__dirname, '..')] } },
 	test: {
 		include: ['**/*.test.ts', '**/*.test.tsx'],
+		// happy-dom rejects a component's pending animation when the test unmounts it; that is teardown noise, not a failure.
+		onUnhandledError(error) {
+			if (error?.name === 'AbortError' && /animation was canceled/i.test(String(error.message))) return false;
+		},
 	},
 });

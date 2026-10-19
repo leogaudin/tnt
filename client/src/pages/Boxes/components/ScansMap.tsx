@@ -42,7 +42,7 @@ function ScansMap({
 			center,
 			zoom,
 		});
-		map._container.style.width = '100%';
+		map.getContainer().style.width = '100%';
 		return map;
 	};
 
