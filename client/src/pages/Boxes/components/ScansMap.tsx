@@ -1,9 +1,14 @@
 import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { palette } from '../../../theme';
-import { Map, Marker } from 'maplibre-gl';
+import { Map, Marker, setWorkerUrl } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+// MapLibre looks for its worker next to the bundle that imports it, which does not exist here (the SPA rewrite answers
+// with index.html). Vite bundles the worker, with the shared chunk it imports, and MapLibre is told where it is.
+import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import { getLngLatCenter, getZoomLevel } from '../../../service/utils';
+
+setWorkerUrl(workerUrl);
 
 function ScansMap({
 	box,

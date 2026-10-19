@@ -62,5 +62,7 @@ export default defineConfig(() => {
     plugins: [react(), countryHtml(readHtmlFields(dir))],
     resolve: { alias: { '@country': dir } },
     publicDir: path.join(dir, 'public'),
+    // MapLibre's worker is an ES module that imports a shared chunk
+    worker: { format: 'es' },
   }
 })
