@@ -1,0 +1,7 @@
+{
+  "name": "image-size",
+  "version": "2.0.3-metro-shim",
+  "private": true,
+  "description": "Metro 0.80 calls image-size 1.x as getImageSize(pathOrBuffer); this keeps that call working on the patched 2.x.",
+  "main": "index.js"
+}
