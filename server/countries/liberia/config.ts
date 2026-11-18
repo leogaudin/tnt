@@ -6,6 +6,7 @@ export default {
 		county: { required: true },
 		schoolCode: { required: true },
 		district: { required: true },
+		city: { required: false },
 		school: { required: true },
 		schoolType: { required: true },
 		schoolSession: { required: true },

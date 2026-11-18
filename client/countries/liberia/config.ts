@@ -19,6 +19,7 @@ export default {
 		county: { required: true },
 		schoolCode: { required: true },
 		district: { required: true },
+		city: { required: false },
 		school: { required: true },
 		schoolType: { required: true },
 		schoolSession: { required: true },
@@ -30,12 +31,14 @@ export default {
 	labels: {
 		en: {
 			county: 'County',
+			city: 'City',
 			school: 'School Name',
 			schoolType: 'School Type',
 			schoolSession: 'School Session',
 		},
 		fr: {
 			county: 'Comté',
+			city: 'Ville',
 			school: 'Nom de l\'école',
 			schoolType: 'Type d\'école',
 			schoolSession: 'Session scolaire',
