@@ -27,6 +27,8 @@ export default defineConfig({
 	server: { fs: { allow: [path.resolve(__dirname, '..')] } },
 	test: {
 		include: ['**/*.test.ts', '**/*.test.tsx'],
+		// Node 25+ has its own `localStorage` global (undefined without --localstorage-file) that hides happy-dom's.
+		execArgv: ['--no-experimental-webstorage'],
 		// happy-dom rejects a component's pending animation when the test unmounts it; that is teardown noise, not a failure.
 		onUnhandledError(error) {
 			if (error?.name === 'AbortError' && /animation was canceled/i.test(String(error.message))) return false;
