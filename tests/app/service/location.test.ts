@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const { getCurrentPosition } = vi.hoisted(() => ({ getCurrentPosition: vi.fn() }));
-vi.mock('@react-native-community/geolocation', () => ({ default: { getCurrentPosition } }));
+const { getCurrentPosition, setRNConfiguration } = vi.hoisted(() => ({ getCurrentPosition: vi.fn(), setRNConfiguration: vi.fn() }));
+vi.mock('@react-native-community/geolocation', () => ({ default: { getCurrentPosition, setRNConfiguration } }));
 
 // @ts-ignore (plain JS module)
 import { getLocation, locationErrorMessage } from '@app/service/location';
@@ -13,7 +13,14 @@ const answer = (...results: any[]) => {
 		getCurrentPosition.mockImplementationOnce((ok: Function, fail: Function) => (result.coords ? ok(result) : fail(result)));
 };
 
-beforeEach(() => getCurrentPosition.mockReset());
+beforeEach(() => {
+	getCurrentPosition.mockReset();
+	vi.useRealTimers();
+});
+
+it('stops the library from asking for permissions again before each request', () => {
+	expect(setRNConfiguration).toHaveBeenCalledWith(expect.objectContaining({ skipPermissionRequests: true }));
+});
 
 describe('getLocation', () => {
 	it('asks for the network location first, as before', async () => {
@@ -41,6 +48,17 @@ describe('getLocation', () => {
 	it('rejects with the GPS error when both attempts fail', async () => {
 		answer({ code: 2 }, { code: 3 });
 		await expect(getLocation()).rejects.toEqual({ code: 3 });
+	});
+});
+
+describe('getLocation when the library never answers', () => {
+	it('times out each attempt on its own and rejects instead of hanging', async () => {
+		vi.useFakeTimers();
+		getCurrentPosition.mockImplementation(() => {});
+		const result = getLocation().catch((error: any) => error);
+		await vi.advanceTimersByTimeAsync(60000);
+		expect(await result).toMatchObject({ code: 3 });
+		expect(getCurrentPosition).toHaveBeenCalledTimes(2);
 	});
 });
 

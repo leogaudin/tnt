@@ -1,7 +1,19 @@
 import Geolocation from '@react-native-community/geolocation';
 
+// The app asks for permissions at launch. Left to itself, the library asks again before each request when only
+// approximate location is granted, and that request can stay unanswered: no position and no error, forever.
+Geolocation.setRNConfiguration({ skipPermissionRequests: true });
+
+const TIMEOUT = 3;
+
+/** One position request, which settles even if the native side never answers. */
 const getPosition = (options) => new Promise((resolve, reject) => {
-	Geolocation.getCurrentPosition(resolve, reject, options);
+	const guard = setTimeout(() => reject({ code: TIMEOUT, message: 'Location request timed out' }), options.timeout + 1000);
+	Geolocation.getCurrentPosition(
+		(position) => { clearTimeout(guard); resolve(position); },
+		(error) => { clearTimeout(guard); reject(error); },
+		options,
+	);
 });
 
 /**
