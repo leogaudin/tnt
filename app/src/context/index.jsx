@@ -1,5 +1,4 @@
 import React, { createContext, useEffect, useRef, useState } from 'react';
-import NetInfo from '@react-native-community/netinfo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { dedupeOfflineData, getString, removeValue, storeOfflineData } from '../service/storage';
 import { requestAllPermissions } from '../service/permissions';
@@ -8,8 +7,6 @@ import { loginKey, offlineKey } from '../constants';
 const AppContext = createContext({
 	login: null,
 	setLogin: () => { },
-	hasInternetConnection: false,
-	setInternetConnection: () => { },
 	hasCameraPermissions: true,
 	setCameraPermissions: () => { },
 	hasLocationPermissions: true,
@@ -23,7 +20,6 @@ const AppContext = createContext({
 
 export const AppProvider = ({ children }) => {
 	const [login, setLogin] = useState(null);
-	const [hasInternetConnection, setInternetConnection] = useState(false);
 	const [hasCameraPermissions, setCameraPermissions] = useState(true);
 	const [hasLocationPermissions, setLocationPermissions] = useState(true);
 	const [offlineData, setOfflineData] = useState([]);
@@ -38,10 +34,6 @@ export const AppProvider = ({ children }) => {
 	}, [offlineData]);
 
 	useEffect(() => {
-		const hasConnection = NetInfo.addEventListener((state) => {
-			setInternetConnection(state.isConnected);
-		});
-
 		const checkLogin = async () => {
 			const userNumber = await getString(loginKey);
 			setLogin(userNumber);
@@ -66,7 +58,6 @@ export const AppProvider = ({ children }) => {
 		};
 
 		Promise.all([
-			hasConnection,
 			checkLogin(),
 			checkAllPermissions(),
 			retrieveOfflineData(),
@@ -78,9 +69,7 @@ export const AppProvider = ({ children }) => {
 		<AppContext.Provider
 			value={{
 				login,
-				hasInternetConnection,
 				setLogin,
-				setInternetConnection,
 				hasCameraPermissions,
 				setCameraPermissions,
 				hasLocationPermissions,

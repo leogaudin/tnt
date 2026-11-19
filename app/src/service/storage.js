@@ -109,3 +109,24 @@ export const sendOfflineData = async (offlineData, setOfflineData) => {
 		);
 	}
 };
+
+/**
+ * Sends a scan, or keeps it in the offline queue if it cannot be sent.
+ * Always tries the network first: the phone's connectivity status can be wrong or late.
+ *
+ * @param {Scan} scan
+ * @param {Function} setOfflineData The setter of the offline queue
+ */
+export const submitScan = async (scan, setOfflineData) => {
+	try {
+		await sendScan(scan);
+	} catch (error) {
+		console.error('Error sending scan:', error);
+		setOfflineData((prev) => [...prev, scan]);
+		showToast(
+			'info',
+			'Scan saved offline',
+			'Send it later from the offline scans list',
+		);
+	}
+};

@@ -8,12 +8,15 @@ import { PERMISSIONS, request } from 'react-native-permissions';
 export const requestAllPermissions = async () => {
 	try {
 		if (Platform.OS === 'android') {
+			// Fine location lets the GPS fallback work; approximate location alone is still enough to launch.
 			const result = await PermissionsAndroid.requestMultiple([
+				PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
 				PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION,
 				PermissionsAndroid.PERMISSIONS.CAMERA,
 			]);
 			return ({
-				location: result['android.permission.ACCESS_COARSE_LOCATION'] === 'granted',
+				location: result['android.permission.ACCESS_FINE_LOCATION'] === 'granted'
+					|| result['android.permission.ACCESS_COARSE_LOCATION'] === 'granted',
 				camera: result['android.permission.CAMERA'] === 'granted'
 			});
 		} else if (Platform.OS === 'ios') {

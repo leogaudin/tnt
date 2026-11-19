@@ -1,19 +1,12 @@
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 import { ScrollView, View } from 'react-native';
 import InfoModal from './InfoModal';
 import { Button, Text } from 'react-native-paper';
 import { sendOfflineData } from '../service/storage'
 import AppContext from '../context';
-import NetInfo from '@react-native-community/netinfo';
 
 export default function OfflineScansModal({ visible, onClose }) {
-	const { offlineData, setOfflineData, hasInternetConnection, setInternetConnection } = useContext(AppContext);
-
-	useEffect(() => {
-		NetInfo.addEventListener((state) => {
-			setInternetConnection(state.isConnected);
-		});
-	}, []);
+	const { offlineData, setOfflineData } = useContext(AppContext);
 
 	return (
 		<InfoModal
@@ -52,7 +45,6 @@ export default function OfflineScansModal({ visible, onClose }) {
 										sendOfflineData(offlineData, setOfflineData);
 										onClose();
 									}}
-									disabled={!hasInternetConnection}
 									style={{ marginTop: 20 }}
 								>
 									Send offline scans

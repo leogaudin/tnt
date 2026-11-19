@@ -7,18 +7,19 @@ import {
 	View,
 } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
-import Geolocation from '@react-native-community/geolocation';
 import styles from '../theme/styles';
 import { showToast } from '../service/toast';
 import { Modal, Text, TextInput, Portal, Button } from 'react-native-paper';
-import { sendScan } from '../service/api';
+import { submitScan } from '../service/storage';
+import { getLocation, locationErrorMessage } from '../service/location';
 import AppContext from '../context';
 
 export default function SendScanModal({ modalVisible, setModalVisible, data }) {
 	const [userLocation, setUserLocation] = useState();
+	const [locationError, setLocationError] = useState(null);
 	const [comment, setComment] = useState('');
 	const [toggled, setToggled] = useState(false);
-	const { login, hasInternetConnection, setOfflineData } = useContext(AppContext);
+	const { login, setOfflineData } = useContext(AppContext);
 
 	const handleSubmit = () => {
 		const scan = {
@@ -31,43 +32,28 @@ export default function SendScanModal({ modalVisible, setModalVisible, data }) {
 		};
 		setModalVisible(false);
 		resetData();
-		if (hasInternetConnection) {
-			sendScan(scan)
-				.catch(err => {
-					setOfflineData((prev) => [...prev, scan]);
-				});
-		} else {
-			setOfflineData((prev) => [...prev, scan]);
-			showToast(
-				'info',
-				'No internet connection',
-				'Scan will be sent when connection is restored',
-			);
-		}
+		submitScan(scan, setOfflineData);
+	};
+
+	const locate = () => {
+		setLocationError(null);
+		getLocation()
+			.then(setUserLocation)
+			.catch((error) => {
+				const message = locationErrorMessage(error);
+				setLocationError(message);
+				showToast('error', 'Location', message);
+			});
 	};
 
 	useEffect(() => {
-		if (modalVisible) {
-			Geolocation.getCurrentPosition(
-				(position) => {
-					setUserLocation(position);
-				},
-				(error) => {
-					if (error.code === 3) {
-						showToast('error', 'Timeout', 'The location search has timed out.');
-					}
-				},
-				{
-					enableHighAccuracy: false,
-					timeout: 10000,
-					maximumAge: 10000,
-				},
-			);
-		}
+		if (modalVisible)
+			locate();
 	}, [modalVisible]);
 
 	function resetData() {
 		setUserLocation(null);
+		setLocationError(null);
 		setComment('');
 		setToggled(false);
 	}
@@ -98,12 +84,17 @@ export default function SendScanModal({ modalVisible, setModalVisible, data }) {
 									}}
 								>
 									<Text style={{ fontWeight: 'bold' }}>Location</Text>
-									<Text>
+									<Text style={{ textAlign: 'center' }}>
 										{userLocation
 											? `(${userLocation.coords.latitude}, ${userLocation.coords.longitude})`
-											: `Determining...`
+											: locationError ?? `Determining...`
 										}
 									</Text>
+									{!userLocation && locationError && (
+										<Button mode='text' onPress={locate}>
+											Retry
+										</Button>
+									)}
 								</View>
 								<TextInput
 									mode='outlined'

@@ -14,7 +14,7 @@ vi.mock('@app/service/toast', () => ({ showToast: vi.fn() }));
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 // @ts-ignore (plain JS module)
-import { storeOfflineData, dedupeOfflineData, sendOfflineData } from '@app/service/storage';
+import { storeOfflineData, dedupeOfflineData, sendOfflineData, submitScan } from '@app/service/storage';
 // @ts-ignore
 import { sendScan } from '@app/service/api';
 // @ts-ignore
@@ -165,5 +165,23 @@ describe('sendOfflineData', () => {
 		await sendOfflineData([], makeState([]).setOfflineData);
 		expect(sendScan).not.toHaveBeenCalled();
 		expect(showToast).not.toHaveBeenCalled();
+	});
+});
+
+describe('submitScan', () => {
+	it('sends the scan without queuing it when the server accepts it', async () => {
+		(sendScan as any).mockResolvedValueOnce({});
+		const setOfflineData = vi.fn();
+		await submitScan(scan('a', 1), setOfflineData);
+		expect(sendScan).toHaveBeenCalledWith(scan('a', 1));
+		expect(setOfflineData).not.toHaveBeenCalled();
+	});
+
+	it('queues the scan and says so when it cannot be sent', async () => {
+		(sendScan as any).mockRejectedValueOnce(new Error('Network request failed'));
+		let queue: any[] = [scan('a', 1)];
+		await submitScan(scan('b', 2), (update: Function) => { queue = update(queue); });
+		expect(queue).toEqual([scan('a', 1), scan('b', 2)]);
+		expect(showToast).toHaveBeenCalledWith('info', 'Scan saved offline', expect.any(String));
 	});
 });
