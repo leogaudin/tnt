@@ -12,12 +12,12 @@ const getPosition = (options) => new Promise((resolve, reject) => {
  */
 export const getLocation = async () => {
 	try {
-		return await getPosition({ enableHighAccuracy: false, timeout: 10000, maximumAge: 10000 });
+		return await getPosition({ enableHighAccuracy: false, timeout: 5000, maximumAge: 10000 });
 	} catch (error) {
 		// Without permission the second attempt would fail the same way.
 		if (error?.code === 1)
 			throw error;
-		return getPosition({ enableHighAccuracy: true, timeout: 20000, maximumAge: 10000 });
+		return getPosition({ enableHighAccuracy: true, timeout: 10000, maximumAge: 10000 });
 	}
 };
 
