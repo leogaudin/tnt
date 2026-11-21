@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:orientation="vertical"
+	android:paddingHorizontal="15dp"
+	android:paddingVertical="10dp">
+
+	<TextView
+		style="@style/Tnt.Title"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:text="@string/offline_scans" />
+
+	<ScrollView
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+
+		<LinearLayout
+			android:id="@+id/list"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="vertical" />
+	</ScrollView>
+
+	<TextView
+		android:id="@+id/empty"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:gravity="center"
+		android:text="@string/no_offline_scans"
+		android:textColor="@android:color/black" />
+
+	<com.google.android.material.button.MaterialButton
+		android:id="@+id/send_all"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginTop="20dp"
+		android:text="@string/send_offline_scans" />
+
+	<com.google.android.material.button.MaterialButton
+		android:id="@+id/close"
+		style="@style/Widget.Material3.Button.OutlinedButton"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginVertical="20dp"
+		android:text="@string/close" />
+</LinearLayout>

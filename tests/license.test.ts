@@ -25,6 +25,21 @@ describe('attribution notice required by LICENSE (AGPL section 7(b))', () => {
 	});
 });
 
+describe('attribution notice in the native Android scanner', () => {
+	const strings = 'android/app/src/main/res/values/strings.xml';
+
+	it('shows the notice and links to the upstream repository', () => {
+		const src = read(strings);
+		expect(src).toContain(NOTICE);
+		expect(src).toContain(URL);
+	});
+
+	it('the scanner screen displays the notice and opens the link', () => {
+		expect(read('android/app/src/main/res/layout/activity_main.xml')).toContain('@string/powered_by"');
+		expect(read('android/app/src/main/kotlin/com/tnt/scanner/MainActivity.kt')).toContain('R.string.powered_by_url');
+	});
+});
+
 describe('declared package licenses match LICENSE', () => {
 	it.each(['server', 'client', 'app'])('%s/package.json', (pkg) => {
 		expect(JSON.parse(read(`${pkg}/package.json`)).license).toBe('AGPL-3.0-only');
