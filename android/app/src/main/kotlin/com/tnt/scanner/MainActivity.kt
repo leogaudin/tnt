@@ -111,6 +111,11 @@ class MainActivity : AppCompatActivity() {
 		showLoginIfNeeded()
 		val granted = hasRequiredPermissions()
 		binding.permissions.visibility = if (granted) View.GONE else View.VISIBLE
+		// Dark icons on the light permissions screen, light ones over the camera.
+		WindowCompat.getInsetsController(window, binding.root).apply {
+			isAppearanceLightStatusBars = !granted
+			isAppearanceLightNavigationBars = !granted
+		}
 		if (granted) startCamera() else binding.poweredBy.visibility = View.GONE
 	}
 
