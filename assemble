@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 # Builds the Android app for one country.
 #
-#   ./assemble <release|debug> <country> [--aab] [--open]
+#   ./assemble <release|debug> <country> [--rn] [--aab] [--open]
+#
+# By default this builds the native Kotlin app (android/). --rn builds the React Native app (app/) instead,
+# which is the one kept for iOS and the 1.x field releases; --aab only applies to it.
 #
 # The country is a folder of app/countries/ (e.g. malawi, rwanda). In a
 # standalone export the country argument is optional (app/countries/default.json).
@@ -20,7 +23,7 @@ available() {
 
 usage() {
 	cat >&2 <<USAGE
-Usage: ./assemble <release|debug> <country> [--aab] [--open]
+Usage: ./assemble <release|debug> <country> [--rn] [--aab] [--open]
 
 Available countries:
 $(available)
@@ -32,9 +35,11 @@ MODE=""
 COUNTRY=""
 AAB=0
 OPEN=0
+RN=0
 for arg in "$@"; do
 	case "$arg" in
 		--aab) AAB=1 ;;
+		--rn) RN=1 ;;
 		--open) OPEN=1 ;;
 		-h|--help) usage ;;
 		--*) echo "Unknown option: $arg" >&2; usage ;;
@@ -71,7 +76,15 @@ if [ "$MODE" = "release" ] && [ "$COUNTRY" = "_default" ]; then
 	exit 1
 fi
 
-VERSION="$(node -p "require('$ROOT/app/package.json').version")"
+if [ "$RN" = 1 ]; then
+	VERSION="$(node -p "require('$ROOT/app/package.json').version")"
+else
+	VERSION="$(node -p "require('$ROOT/android/version.json').version")"
+	if [ "$AAB" = 1 ]; then
+		echo "--aab is only supported with --rn." >&2
+		exit 1
+	fi
+fi
 if [ "$AAB" = 1 ]; then
 	TASK_PREFIX="bundle"; EXT="aab"; SUBDIR="bundle"
 else
@@ -80,15 +93,20 @@ fi
 MODE_CAP="$(echo "${MODE:0:1}" | tr '[:lower:]' '[:upper:]')${MODE:1}"
 TASK="${TASK_PREFIX}${MODE_CAP}"
 
-echo "Building $COUNTRY $VERSION ($MODE, $EXT)"
-cd "$ROOT/app/android"
-# TNT_COUNTRY is read by Metro (the JS bundle), -PtntCountry by Gradle (app id, name, icons).
-TNT_COUNTRY="$COUNTRY" ./gradlew clean "$TASK" -PtntCountry="$COUNTRY"
+echo "Building $COUNTRY $VERSION ($MODE, $EXT, $([ "$RN" = 1 ] && echo "React Native" || echo native))"
+if [ "$RN" = 1 ]; then
+	GRADLE_DIR="$ROOT/app/android"
+	# TNT_COUNTRY is read by Metro (the JS bundle), -PtntCountry by Gradle (app id, name, icons).
+	(cd "$GRADLE_DIR" && TNT_COUNTRY="$COUNTRY" ./gradlew clean "$TASK" -PtntCountry="$COUNTRY")
+else
+	GRADLE_DIR="$ROOT/android"
+	(cd "$GRADLE_DIR" && ./gradlew clean "$TASK" -PtntCountry="$COUNTRY")
+fi
 
 OUT_DIR="app/build/outputs/$SUBDIR/$MODE"
-SRC="$(ls "$ROOT/app/android/$OUT_DIR"/*."$EXT" 2>/dev/null | head -1 || true)"
+SRC="$(ls "$GRADLE_DIR/$OUT_DIR"/*."$EXT" 2>/dev/null | head -1 || true)"
 if [ -z "$SRC" ]; then
-	echo "Build finished but no .$EXT was found in app/android/$OUT_DIR" >&2
+	echo "Build finished but no .$EXT was found in $GRADLE_DIR/$OUT_DIR" >&2
 	exit 1
 fi
 
