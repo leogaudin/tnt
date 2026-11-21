@@ -19,4 +19,18 @@ class PhoneNumbers(private val util: PhoneNumberUtil) {
 			null
 		}
 	}
+
+	/**
+	 * The digits of [input] formatted as an international number as they are typed (`+231 77 123`). Without trailing
+	 * separators: the formatter ends `+33` with a space, which a backspace would remove and the field add back, so
+	 * nothing before it could ever be deleted.
+	 */
+	fun format(input: String): String {
+		val digits = input.filter { it.isDigit() }
+		if (digits.isEmpty()) return ""
+		val formatter = util.getAsYouTypeFormatter("FR")
+		var formatted = formatter.inputDigit('+')
+		for (c in digits) formatted = formatter.inputDigit(c)
+		return formatted.trimEnd { !it.isDigit() }
+	}
 }

@@ -51,4 +51,21 @@ class PhoneNumbersTest {
 		assertNull(phones.normalize("+33 7 42 42"))
 		assertNull(phones.normalize("+999 123456789"))
 	}
+
+	@Test
+	fun `typed digits are formatted as an international number`() {
+		assertEquals("+231 77 123", phones.format("23177123"))
+		assertEquals("+33 7 42 42 42 42", phones.format("+33742424242"))
+		assertEquals("", phones.format(""))
+		assertEquals("", phones.format("+"))
+	}
+
+	@Test
+	fun `a dial code has no trailing space, so a backspace can go past it`() {
+		assertEquals("+33", phones.format("33"))
+		assertEquals("+3", phones.format("3"))
+		// Backspace on "+33" leaves "+3", then "+", then nothing.
+		assertEquals("+3", phones.format("+3"))
+		assertEquals("", phones.format("+"))
+	}
 }

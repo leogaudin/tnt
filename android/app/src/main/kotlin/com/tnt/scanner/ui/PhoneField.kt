@@ -6,6 +6,7 @@ import android.text.TextWatcher
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import com.tnt.scanner.phone.PhoneNumbers
 import io.michaelrocks.libphonenumber.android.NumberParseException
 import io.michaelrocks.libphonenumber.android.PhoneNumberUtil
 import java.util.Locale
@@ -22,6 +23,7 @@ class PhoneField(
 	initial: String,
 	private val onChange: () -> Unit,
 ) {
+	private val phones = PhoneNumbers(util)
 	private var formatting = false
 
 	init {
@@ -41,17 +43,14 @@ class PhoneField(
 	val text: String get() = input.text.toString()
 
 	private fun format(raw: String) {
-		val digits = raw.filter { it.isDigit() }
-		val formatter = util.getAsYouTypeFormatter("FR")
-		var formatted = if (digits.isEmpty()) "" else formatter.inputDigit('+')
-		for (c in digits) formatted = formatter.inputDigit(c)
+		val formatted = phones.format(raw)
 		formatting = true
 		if (input.text.toString() != formatted) {
 			input.setText(formatted)
 			input.setSelection(formatted.length)
 		}
 		formatting = false
-		flag.text = regionFlag(regionOf(digits))
+		flag.text = regionFlag(regionOf(raw.filter { it.isDigit() }))
 	}
 
 	private fun regionOf(digits: String): String? {

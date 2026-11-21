@@ -6,6 +6,7 @@ import android.location.Location
 import android.location.LocationManager
 import android.os.Build
 import android.os.SystemClock
+import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.core.location.LocationManagerCompat
 import androidx.core.os.CancellationSignal
@@ -13,11 +14,17 @@ import com.tnt.scanner.data.ScanLocation
 
 /** The platform's `LocationManager`, with no dependency on Google Play Services (absent on some field phones). */
 class AndroidLocationSource(context: Context) : LocationSource {
+	private companion object {
+		const val TAG = "TntLocation"
+	}
+
 	private val manager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 	private val mainExecutor = ContextCompat.getMainExecutor(context)
 
 	@SuppressLint("MissingPermission") // a missing permission is a SecurityException, reported as DENIED
 	override fun request(provider: Provider, maxAgeMs: Long, onResult: (LocationResult) -> Unit): () -> Unit {
+		val started = SystemClock.elapsedRealtime()
+		Log.d(TAG, "request $provider")
 		val name = if (provider == Provider.GPS) LocationManager.GPS_PROVIDER else LocationManager.NETWORK_PROVIDER
 		try {
 			if (!LocationManagerCompat.isLocationEnabled(manager) || !manager.isProviderEnabled(name)) {
@@ -30,6 +37,7 @@ class AndroidLocationSource(context: Context) : LocationSource {
 			}
 			val signal = CancellationSignal()
 			LocationManagerCompat.getCurrentLocation(manager, name, signal, mainExecutor) { location ->
+				Log.d(TAG, "$provider answered after ${SystemClock.elapsedRealtime() - started} ms: ${location != null}")
 				onResult(
 					if (location != null) LocationResult.Fix(toScanLocation(location))
 					else LocationResult.Failure(LocationFailure.UNAVAILABLE),
