@@ -2,6 +2,7 @@ import BackgroundTasks
 import Foundation
 import Network
 import Observation
+import os
 
 struct Toast: Equatable, Identifiable {
 	let id = UUID()
@@ -171,6 +172,11 @@ enum BackgroundSend {
 	static func schedule() {
 		let request = BGAppRefreshTaskRequest(identifier: identifier)
 		request.earliestBeginDate = Date(timeIntervalSinceNow: 15 * 60)
-		try? BGTaskScheduler.shared.submit(request)
+		do {
+			try BGTaskScheduler.shared.submit(request)
+		} catch {
+			// Expected in the simulator, and when the user turned Background App Refresh off: nothing else to do.
+			Logger(subsystem: "com.tnt.scanner", category: "BackgroundSend").notice("Not scheduled: \(error.localizedDescription)")
+		}
 	}
 }
