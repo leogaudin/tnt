@@ -6,6 +6,8 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 
 export default [
 	{ ignores: ['dist'] },
+	// Runs in Node when Vite starts, not in the browser.
+	{ files: ['vite.config.js'], languageOptions: { globals: globals.node } },
 	{
 		files: ['**/*.{js,jsx}'],
 		languageOptions: {
