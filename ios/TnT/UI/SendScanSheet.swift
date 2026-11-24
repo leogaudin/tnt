@@ -1,3 +1,4 @@
+import MapKit
 import SwiftUI
 
 /// The scan form: finds the position as soon as it opens, and lets Send through once there is one.
@@ -16,6 +17,7 @@ struct SendScanSheet: View {
 		NavigationStack {
 			Form {
 				Section(Strings.location) {
+					if let location { PositionMap(location: location) }
 					HStack {
 						if location == nil && failure == nil { ProgressView() }
 						Text(locationText)
@@ -103,5 +105,30 @@ struct SendScanSheet: View {
 enum Coordinates {
 	static func format(_ value: Double) -> String {
 		value.formatted(.number.locale(Locale(identifier: "en_US_POSIX")).grouping(.never).precision(.fractionLength(0...5)))
+	}
+}
+
+/// Where the position is, for a glance: a pin and the circle of its accuracy. Not interactive, and blank without a
+/// network, where the coordinates under it still say everything.
+private struct PositionMap: View {
+	let location: ScanLocation
+
+	var body: some View {
+		let center = CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude)
+		// Tight enough to see streets, loose enough to contain the circle of a coarse fix.
+		let radius = max(location.accuracy ?? 0, 0)
+		let span = max(0.004, min(radius * 2.5 / 111_000, 0.5))
+		Map(initialPosition: .region(MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: span, longitudeDelta: span))), interactionModes: []) {
+			if radius > 0 {
+				MapCircle(center: center, radius: radius)
+					.foregroundStyle(Theme.tint.opacity(0.2))
+					.stroke(Theme.tint, lineWidth: 1)
+			}
+			Marker("", coordinate: center).tint(Theme.tint)
+		}
+		.frame(height: 150)
+		.clipShape(RoundedRectangle(cornerRadius: 8))
+		.listRowInsets(EdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 8))
+		.accessibilityIdentifier("position-map")
 	}
 }
