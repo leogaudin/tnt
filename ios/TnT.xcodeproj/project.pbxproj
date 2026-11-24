@@ -480,10 +480,10 @@
 /* Begin XCRemoteSwiftPackageReference section */
 		K00000000000000000000001 /* XCRemoteSwiftPackageReference "PhoneNumberKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/marmelroy/PhoneNumberKit";
+			repositoryURL = "https://github.com/PhoneNumberKit/PhoneNumberKit";
 			requirement = {
 				kind = exactVersion;
-				version = 4.3.0;
+				version = 5.0.13;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
