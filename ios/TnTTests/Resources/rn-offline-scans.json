@@ -1,0 +1,27 @@
+[
+	{
+		"boxId": "11sG0fpGBwU",
+		"operatorId": "+231770123456",
+		"time": 1763700000000,
+		"location": {
+			"coords": { "latitude": 6.3, "longitude": -10.8, "altitude": 12.5, "accuracy": 20, "heading": 0, "speed": 0 },
+			"timestamp": 1763699995000,
+			"mocked": false
+		},
+		"markedAsReceived": false,
+		"comment": ""
+	},
+	{
+		"boxId": "abc123",
+		"operatorId": "+231770123456",
+		"time": 1763700060000,
+		"location": {
+			"coords": { "latitude": 6.31, "longitude": -10.81, "altitude": null, "accuracy": 35.5, "heading": null, "speed": null },
+			"timestamp": 1763700055000,
+			"mocked": true,
+			"extras": { "maxCn0": 0, "meanCn0": 0, "satellites": 0 }
+		},
+		"markedAsReceived": true,
+		"comment": "Box n°2, déchargé"
+	}
+]

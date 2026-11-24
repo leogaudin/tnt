@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
-# Builds the Android app for one country.
+# Builds the mobile app for one country.
 #
-#   ./assemble <release|debug> <country> [--rn] [--aab] [--open]
+#   ./assemble <release|debug> <country> [--ios] [--rn] [--aab] [--open]
 #
-# By default this builds the native Kotlin app (android/). --rn builds the React Native app (app/) instead,
-# which is the one kept for iOS and the 1.x field releases; --aab only applies to it.
+# By default this builds the native Kotlin Android app (android/). --ios builds the native Swift iOS app (ios/)
+# instead: debug for the simulator, release as an .xcarchive (nothing is exported or uploaded). --rn builds the
+# React Native app (app/) instead, which is kept for the 1.x field releases; --aab only applies to it.
 #
 # The country is a folder of app/countries/ (e.g. malawi, rwanda). In a
 # standalone export the country argument is optional (app/countries/default.json).
-# Output: dist/mobile/<country>-<version>-<mode>.(apk|aab)
+# Output: dist/mobile/<country>-<version>-<mode>.(apk|aab|app|xcarchive)
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
@@ -23,7 +24,7 @@ available() {
 
 usage() {
 	cat >&2 <<USAGE
-Usage: ./assemble <release|debug> <country> [--rn] [--aab] [--open]
+Usage: ./assemble <release|debug> <country> [--ios] [--rn] [--aab] [--open]
 
 Available countries:
 $(available)
@@ -36,10 +37,12 @@ COUNTRY=""
 AAB=0
 OPEN=0
 RN=0
+IOS=0
 for arg in "$@"; do
 	case "$arg" in
 		--aab) AAB=1 ;;
 		--rn) RN=1 ;;
+		--ios) IOS=1 ;;
 		--open) OPEN=1 ;;
 		-h|--help) usage ;;
 		--*) echo "Unknown option: $arg" >&2; usage ;;
@@ -53,7 +56,7 @@ done
 
 case "$MODE" in
 	release|debug) ;;
-	ios) echo "iOS builds are not supported." >&2; exit 1 ;;
+	ios) echo "Use --ios: ./assemble <release|debug> <country> --ios" >&2; exit 1 ;;
 	*) usage ;;
 esac
 
@@ -76,6 +79,11 @@ if [ "$MODE" = "release" ] && [ "$COUNTRY" = "_default" ]; then
 	exit 1
 fi
 
+if [ "$IOS" = 1 ] && { [ "$RN" = 1 ] || [ "$AAB" = 1 ]; }; then
+	echo "--ios cannot be combined with --rn or --aab." >&2
+	exit 1
+fi
+
 if [ "$RN" = 1 ]; then
 	VERSION="$(node -p "require('$ROOT/app/package.json').version")"
 else
@@ -85,6 +93,31 @@ else
 		exit 1
 	fi
 fi
+
+if [ "$IOS" = 1 ]; then
+	VERSION="$(node -p "require('$ROOT/android/version.json').version")"
+	echo "Building $COUNTRY $VERSION ($MODE, iOS)"
+	"$ROOT/ios/configure.sh" "$COUNTRY"
+	IOS_BUILD="$ROOT/ios/build"
+	mkdir -p "$ROOT/dist/mobile"
+	if [ "$MODE" = "debug" ]; then
+		(cd "$ROOT/ios" && xcodebuild build -project TnT.xcodeproj -scheme TnT -configuration Debug \
+			-destination 'generic/platform=iOS Simulator' -derivedDataPath "$IOS_BUILD" CODE_SIGNING_ALLOWED=NO)
+		DEST="$ROOT/dist/mobile/$COUNTRY-$VERSION-debug.app"
+		rm -rf "$DEST"
+		cp -R "$IOS_BUILD/Build/Products/Debug-iphonesimulator/TnT.app" "$DEST"
+	else
+		DEST="$ROOT/dist/mobile/$COUNTRY-$VERSION-release.xcarchive"
+		rm -rf "$DEST"
+		(cd "$ROOT/ios" && xcodebuild archive -project TnT.xcodeproj -scheme TnT -configuration Release \
+			-destination 'generic/platform=iOS' -archivePath "$DEST" -derivedDataPath "$IOS_BUILD" \
+			-allowProvisioningUpdates)
+	fi
+	echo "Built: $DEST"
+	[ "$OPEN" = 1 ] && open "$(dirname "$DEST")" || true
+	exit 0
+fi
+
 if [ "$AAB" = 1 ]; then
 	TASK_PREFIX="bundle"; EXT="aab"; SUBDIR="bundle"
 else

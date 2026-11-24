@@ -1,0 +1,6 @@
+build/
+DerivedData/
+xcuserdata/
+*.xcuserstate
+Config/Country.xcconfig
+Config/Generated/Assets.xcassets/CountryAppIcon.appiconset/
