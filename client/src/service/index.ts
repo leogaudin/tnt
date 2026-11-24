@@ -1,13 +1,17 @@
 import i18n from '../language';
 
-import Login from '../pages/Login';
-import Home from '../pages/Home';
-import Boxes from '../pages/Boxes';
-import Scans from '../pages/Scans';
-import Import from '../pages/Import';
-import Export from '../pages/Export';
-import Advanced from '../pages/Advanced';
-import PublicInsights from '../pages/PublicInsights';
+import { lazy } from 'react';
+
+// Each page is its own chunk, loaded when its route is first opened: the map, the PDF and the CSV libraries are only
+// downloaded by the pages that use them.
+const Login = lazy(() => import('../pages/Login'));
+const Home = lazy(() => import('../pages/Home'));
+const Boxes = lazy(() => import('../pages/Boxes'));
+const Scans = lazy(() => import('../pages/Scans'));
+const Import = lazy(() => import('../pages/Import'));
+const Export = lazy(() => import('../pages/Export'));
+const Advanced = lazy(() => import('../pages/Advanced'));
+const PublicInsights = lazy(() => import('../pages/PublicInsights'));
 
 import { IoHome, IoClose, IoCheckmark, IoPrint } from 'react-icons/io5';
 import { FaBoxOpen, FaChevronUp, FaChevronDown, FaMapPin, FaEye, FaClock, FaQrcode, FaPlus, FaCopy, FaChevronRight, FaChevronLeft, FaSearch, FaLink } from 'react-icons/fa';

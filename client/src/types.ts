@@ -1,5 +1,5 @@
 import type { IconType } from 'react-icons';
-import type { ComponentType } from 'react';
+import type { ComponentType, LazyExoticComponent } from 'react';
 
 // ── Domain types ──
 
@@ -79,7 +79,7 @@ export interface ProgressInfo {
 
 export interface Route {
 	path: string;
-	component: ComponentType;
+	component: ComponentType | LazyExoticComponent<ComponentType>;
 	title?: string;
 	inNav?: boolean;
 	icon?: IconType;

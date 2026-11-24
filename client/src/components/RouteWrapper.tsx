@@ -1,5 +1,5 @@
-import { Flex, Link, Text } from '@chakra-ui/react';
-import { useEffect } from 'react';
+import { Flex, Link, Spinner, Text } from '@chakra-ui/react';
+import { Suspense, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { navbarWidth, user } from '../service';
 import Navbar from './Navbar';
@@ -35,7 +35,9 @@ export default function RouteWrapper({ route }) {
 					overflow='hidden'
 					padding={5}
 				>
-					<route.component />
+					<Suspense fallback={<Flex justify='center' padding={10}><Spinner /></Flex>}>
+						<route.component />
+					</Suspense>
 					{/* Attribution notice required by the additional terms in LICENSE
 					    (AGPL-3.0 section 7(b)). Do not remove or hide. */}
 					<Text
