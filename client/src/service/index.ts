@@ -1,17 +1,17 @@
 import i18n from '../language';
 
-import { lazy } from 'react';
+import { lazyPage } from './lazy-page';
 
 // Each page is its own chunk, loaded when its route is first opened: the map, the PDF and the CSV libraries are only
 // downloaded by the pages that use them.
-const Login = lazy(() => import('../pages/Login'));
-const Home = lazy(() => import('../pages/Home'));
-const Boxes = lazy(() => import('../pages/Boxes'));
-const Scans = lazy(() => import('../pages/Scans'));
-const Import = lazy(() => import('../pages/Import'));
-const Export = lazy(() => import('../pages/Export'));
-const Advanced = lazy(() => import('../pages/Advanced'));
-const PublicInsights = lazy(() => import('../pages/PublicInsights'));
+const Login = lazyPage(() => import('../pages/Login'));
+const Home = lazyPage(() => import('../pages/Home'));
+const Boxes = lazyPage(() => import('../pages/Boxes'));
+const Scans = lazyPage(() => import('../pages/Scans'));
+const Import = lazyPage(() => import('../pages/Import'));
+const Export = lazyPage(() => import('../pages/Export'));
+const Advanced = lazyPage(() => import('../pages/Advanced'));
+const PublicInsights = lazyPage(() => import('../pages/PublicInsights'));
 
 import { IoHome, IoClose, IoCheckmark, IoPrint } from 'react-icons/io5';
 import { FaBoxOpen, FaChevronUp, FaChevronDown, FaMapPin, FaEye, FaClock, FaQrcode, FaPlus, FaCopy, FaChevronRight, FaChevronLeft, FaSearch, FaLink } from 'react-icons/fa';
