@@ -1,4 +1,4 @@
-// Settings shared by every country. Country.xcconfig is written by configure.sh from app/countries/<country>/config.json
+// Settings shared by every country. Country.xcconfig is written by configure.sh from mobile/countries/<country>/config.json
 // and overrides the defaults below (those are the _default country).
 TNT_BUNDLE_ID = com.tnt.scanner
 TNT_APP_NAME = Track-and-Trace

@@ -14,7 +14,7 @@ describe('isIncluded', () => {
 		expect(isIncluded('client/countries/liberia/config.ts', 'liberia')).toBe(true);
 		expect(isIncluded('client/countries/senegal/config.ts', 'liberia')).toBe(false);
 		expect(isIncluded('server/countries/_default/config.ts', 'liberia')).toBe(false);
-		expect(isIncluded('app/countries/rwanda/config.json', 'liberia')).toBe(false);
+		expect(isIncluded('mobile/countries/rwanda/config.json', 'liberia')).toBe(false);
 		expect(isIncluded('tests/countries/malawi/anything.ts', 'liberia')).toBe(false);
 	});
 
@@ -55,7 +55,7 @@ describe('export-standalone run', () => {
 	afterAll(() => fs.rmSync(path.dirname(out), { recursive: true, force: true }));
 
 	it('has only senegal, and each default.json names it', () => {
-		for (const pkg of ['client', 'server', 'app']) {
+		for (const pkg of ['client', 'server', 'mobile']) {
 			const dirs = fs.readdirSync(path.join(out, pkg, 'countries'), { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name);
 			expect(dirs).toEqual(['senegal']);
 			expect(JSON.parse(fs.readFileSync(path.join(out, pkg, 'countries/default.json'), 'utf8'))).toEqual({ country: 'senegal' });

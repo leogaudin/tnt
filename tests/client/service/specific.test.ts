@@ -8,7 +8,9 @@ import {
 	gpsUpdateFields,
 	excludedKeys,
 } from '@client/service/specific.js';
-import { colors as appColors, API_URL as appApiUrl } from '@app/service/specific.js';
+import fs from 'node:fs';
+import path from 'node:path';
+import { countryDir } from '../../countries-select';
 
 // boxFields client ↔ server synchronization is checked for every country by countries/consistency.test.ts
 
@@ -66,9 +68,13 @@ describe('client specific.js contract', () => {
 
 });
 
-// ── app specific.js contract ──
+// ── mobile config contract ──
 
-describe('app specific.js contract', () => {
+const mobile = JSON.parse(fs.readFileSync(path.join(countryDir('mobile'), 'config.json'), 'utf8'));
+const appColors: Record<string, string> = mobile.colors;
+const appApiUrl: string = mobile.apiUrl;
+
+describe('mobile config.json contract', () => {
 	it('app colors has all required keys', () => {
 		for (const key of ['lightest', 'light', 'main', 'dark', 'darkest']) {
 			expect(appColors).toHaveProperty(key);

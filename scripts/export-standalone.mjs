@@ -3,7 +3,7 @@
 //
 //   node scripts/export-standalone.mjs <country> <outDir> [--git]
 //
-// The result has only that country's folder in client/, server/, app/ and tests/, each package's
+// The result has only that country's folder in client/, server/, mobile/ and tests/, each package's
 // countries/default.json points at it, so everything builds and runs as that country with no TNT_COUNTRY.
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -11,7 +11,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const PACKAGES = ['client', 'server', 'app'];
+const PACKAGES = ['client', 'server', 'mobile'];
 // The export tool's own test needs every country, which a standalone repo doesn't have.
 const EXCLUDED_FILES = ['tests/scripts/export-standalone.test.ts'];
 
@@ -24,7 +24,7 @@ export function listCountryFolders(pkg, base = root) {
 export function isIncluded(file, country) {
 	if (EXCLUDED_FILES.includes(file)) return false;
 	if (file.startsWith('.github/')) return false;
-	const m = file.match(/^(client|server|app|tests)\/countries\/([^/]+)\/(.*)$/);
+	const m = file.match(/^(client|server|mobile|tests)\/countries\/([^/]+)\/(.*)$/);
 	if (m) return m[2] === country;
 	return true;
 }
@@ -56,7 +56,7 @@ License: AGPL-3.0 with the "Powered by TnT" attribution term of \`LICENSE\`. The
 
 - \`client/countries/${country}/\`: \`config.ts\` (name, colors, API URL, fields, labels), \`public/\` icons, optional \`locales/\`.
 - \`server/countries/${country}/config.ts\`: box fields, report columns, GPS match fields, feature flags.
-- \`app/countries/${country}/\`: \`config.json\` (application id, app name, API URL, colors) and \`android/res\` icons.
+- \`mobile/countries/${country}/\`: \`config.json\` (application id, app name, API URL, colors) and \`android/res\` icons, used by both mobile apps.
 
 If you change a value that two packages share (box fields, colors, API URL), change it in both: \`cd tests && npx vitest run\` checks they agree.
 
@@ -72,10 +72,11 @@ npm run deploy                         # pm2, production
 
 Client (\`client/\`): \`npm ci && npm run build\` produces \`dist/\`. \`VITE_API_URL\` overrides the API URL set in the config.
 
-Mobile app (Android): \`./assemble release\` or \`./assemble debug\` writes the APK to \`dist/mobile/\`. \`./assemble release --aab\` builds a bundle.
-Release builds use the debug keystore unless \`app/countries/${country}/signing.properties\` exists
+Mobile apps: \`./assemble release\` or \`./assemble debug\` builds the Android app (Kotlin, \`android/\`) and writes the APK to \`dist/mobile/\`.
+\`./assemble release --ios\` archives the iOS app (Swift, \`ios/\`; needs Xcode and a signing team). \`./assemble debug --ios\` builds it for the simulator.
+Android release builds use the debug keystore unless \`mobile/countries/${country}/signing.properties\` exists
 (\`storeFile\`, \`storePassword\`, \`keyAlias\`, \`keyPassword\`). Never commit it.
-The app version is \`app/package.json\`'s \`version\`; the Play Store requires it to go up with every release.
+The app version is \`android/version.json\`'s \`version\`, shared by both apps; an app update only installs over a higher versionCode.
 
 ## Tests
 
@@ -100,7 +101,6 @@ jobs:
           node-version: lts/*
       - run: cd server && npm ci && npm run build
       - run: cd client && npm ci && npx tsc --noEmit && npm run build
-      - run: cd app && npm ci --ignore-scripts
       - run: cd tests && npm ci && npx vitest run
 `;
 }

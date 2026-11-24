@@ -11,7 +11,7 @@ import { applyCountryHtml } from '../../client/vite.config.js';
 const root = path.resolve(__dirname, '../..');
 const clientCfg = import.meta.glob('../../client/countries/*/config.ts', { eager: true, import: 'default' }) as Record<string, any>;
 const serverCfg = import.meta.glob('../../server/countries/*/config.ts', { eager: true, import: 'default' }) as Record<string, any>;
-const appCfg = import.meta.glob('../../app/countries/*/config.json', { eager: true, import: 'default' }) as Record<string, any>;
+const appCfg = import.meta.glob('../../mobile/countries/*/config.json', { eager: true, import: 'default' }) as Record<string, any>;
 const localeFiles = import.meta.glob('../../client/countries/*/locales/*.json', { eager: true, import: 'default' }) as Record<string, any>;
 const baseLocales = import.meta.glob('../../client/src/language/locales/*.json', { eager: true, import: 'default' }) as Record<string, Record<string, string>>;
 
@@ -42,9 +42,9 @@ const resolvedLanguage = (c: string, lng: string): Record<string, string> => {
 };
 
 describe('country folders', () => {
-	it('client, server and app list the same countries', () => {
+	it('client, server and mobile list the same countries', () => {
 		expect(dirs('client')).toEqual(countries);
-		expect(dirs('app')).toEqual(countries);
+		expect(dirs('mobile')).toEqual(countries);
 	});
 
 	it('the server registry imports every country folder', async () => {
@@ -53,7 +53,7 @@ describe('country folders', () => {
 	});
 
 	it('every package has a default.json naming an existing country', () => {
-		for (const pkg of ['client', 'server', 'app']) {
+		for (const pkg of ['client', 'server', 'mobile']) {
 			const { country } = JSON.parse(fs.readFileSync(path.join(root, pkg, 'countries/default.json'), 'utf8'));
 			expect(countries, `${pkg}/countries/default.json`).toContain(country);
 		}
@@ -133,9 +133,9 @@ describe.each(countries)('country %s', (c) => {
 
 	it('app has its launcher icons and a package-style applicationId', () => {
 		for (const d of ['mdpi', 'hdpi', 'xhdpi', 'xxhdpi', 'xxxhdpi']) {
-			const f = path.join(root, 'app/countries', c, 'android/res', `mipmap-${d}`, 'ic_launcher.png');
+			const f = path.join(root, 'mobile/countries', c, 'android/res', `mipmap-${d}`, 'ic_launcher.png');
 			// _default and countries without their own icons fall back to _default's
-			if (!fs.existsSync(path.join(root, 'app/countries', c, 'android/res'))) continue;
+			if (!fs.existsSync(path.join(root, 'mobile/countries', c, 'android/res'))) continue;
 			expect(fs.existsSync(f), f).toBe(true);
 		}
 		expect(app[c].applicationId).toMatch(/^[a-z][a-z0-9]*(\.[a-z][a-z0-9_]*)+$/);
@@ -151,7 +151,7 @@ describe('app identity', () => {
 	});
 
 	it('the shared versionCode is above every published one', () => {
-		const version = JSON.parse(fs.readFileSync(path.join(root, 'app/package.json'), 'utf8')).version;
+		const version = JSON.parse(fs.readFileSync(path.join(root, 'android/version.json'), 'utf8')).version;
 		const [major, minor, patch] = version.split('.').map(Number);
 		const code = major * 10000 + minor * 100 + patch;
 		expect(code).toBeGreaterThan(Math.max(...Object.values(PUBLISHED_VERSION_CODES)));

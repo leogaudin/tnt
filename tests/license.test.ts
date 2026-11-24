@@ -17,7 +17,6 @@ describe('attribution notice required by LICENSE (AGPL section 7(b))', () => {
 
 	it.each([
 		['web footer', 'client/src/components/RouteWrapper.tsx'],
-		['mobile scanner', 'app/src/views/Scanner.jsx'],
 	])('%s shows the notice and links to the upstream repository', (_name, file) => {
 		const src = read(file);
 		expect(src).toContain(NOTICE);
@@ -57,7 +56,7 @@ describe('attribution notice in the native iOS scanner', () => {
 });
 
 describe('declared package licenses match LICENSE', () => {
-	it.each(['server', 'client', 'app'])('%s/package.json', (pkg) => {
+	it.each(['server', 'client'])('%s/package.json', (pkg) => {
 		expect(JSON.parse(read(`${pkg}/package.json`)).license).toBe('AGPL-3.0-only');
 	});
 

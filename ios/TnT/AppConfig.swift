@@ -1,6 +1,6 @@
 import Foundation
 
-/// The country build's settings, written into Info.plist from `app/countries/<country>/config.json` (see configure.sh).
+/// The country build's settings, written into Info.plist from `mobile/countries/<country>/config.json` (see configure.sh).
 struct AppConfig: Sendable {
 	let apiUrl: String
 	let colors: [String: String]

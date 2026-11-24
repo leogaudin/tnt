@@ -1,19 +1,18 @@
 #!/usr/bin/env bash
 # Builds the mobile app for one country.
 #
-#   ./assemble <release|debug> <country> [--ios] [--rn] [--aab] [--open]
+#   ./assemble <release|debug> <country> [--ios] [--open]
 #
 # By default this builds the native Kotlin Android app (android/). --ios builds the native Swift iOS app (ios/)
-# instead: debug for the simulator, release as an .xcarchive (nothing is exported or uploaded). --rn builds the
-# React Native app (app/) instead, which is kept for the 1.x field releases; --aab only applies to it.
+# instead: debug for the simulator, release as an .xcarchive (nothing is exported or uploaded).
 #
-# The country is a folder of app/countries/ (e.g. malawi, rwanda). In a
-# standalone export the country argument is optional (app/countries/default.json).
-# Output: dist/mobile/<country>-<version>-<mode>.(apk|aab|app|xcarchive)
+# The country is a folder of mobile/countries/ (e.g. malawi, rwanda). In a
+# standalone export the country argument is optional (mobile/countries/default.json).
+# Output: dist/mobile/<country>-<version>-<mode>.(apk|app|xcarchive)
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
-COUNTRIES="$ROOT/app/countries"
+COUNTRIES="$ROOT/mobile/countries"
 
 available() {
 	for d in "$COUNTRIES"/*/; do
@@ -24,7 +23,7 @@ available() {
 
 usage() {
 	cat >&2 <<USAGE
-Usage: ./assemble <release|debug> <country> [--ios] [--rn] [--aab] [--open]
+Usage: ./assemble <release|debug> <country> [--ios] [--open]
 
 Available countries:
 $(available)
@@ -34,14 +33,10 @@ USAGE
 
 MODE=""
 COUNTRY=""
-AAB=0
 OPEN=0
-RN=0
 IOS=0
 for arg in "$@"; do
 	case "$arg" in
-		--aab) AAB=1 ;;
-		--rn) RN=1 ;;
 		--ios) IOS=1 ;;
 		--open) OPEN=1 ;;
 		-h|--help) usage ;;
@@ -79,23 +74,10 @@ if [ "$MODE" = "release" ] && [ "$COUNTRY" = "_default" ]; then
 	exit 1
 fi
 
-if [ "$IOS" = 1 ] && { [ "$RN" = 1 ] || [ "$AAB" = 1 ]; }; then
-	echo "--ios cannot be combined with --rn or --aab." >&2
-	exit 1
-fi
-
-if [ "$RN" = 1 ]; then
-	VERSION="$(node -p "require('$ROOT/app/package.json').version")"
-else
-	VERSION="$(node -p "require('$ROOT/android/version.json').version")"
-	if [ "$AAB" = 1 ]; then
-		echo "--aab is only supported with --rn." >&2
-		exit 1
-	fi
-fi
+# One version for both apps.
+VERSION="$(node -p "require('$ROOT/android/version.json').version")"
 
 if [ "$IOS" = 1 ]; then
-	VERSION="$(node -p "require('$ROOT/android/version.json').version")"
 	echo "Building $COUNTRY $VERSION ($MODE, iOS)"
 	"$ROOT/ios/configure.sh" "$COUNTRY"
 	IOS_BUILD="$ROOT/ios/build"
@@ -118,33 +100,21 @@ if [ "$IOS" = 1 ]; then
 	exit 0
 fi
 
-if [ "$AAB" = 1 ]; then
-	TASK_PREFIX="bundle"; EXT="aab"; SUBDIR="bundle"
-else
-	TASK_PREFIX="assemble"; EXT="apk"; SUBDIR="apk"
-fi
 MODE_CAP="$(echo "${MODE:0:1}" | tr '[:lower:]' '[:upper:]')${MODE:1}"
-TASK="${TASK_PREFIX}${MODE_CAP}"
 
-echo "Building $COUNTRY $VERSION ($MODE, $EXT, $([ "$RN" = 1 ] && echo "React Native" || echo native))"
-if [ "$RN" = 1 ]; then
-	GRADLE_DIR="$ROOT/app/android"
-	# TNT_COUNTRY is read by Metro (the JS bundle), -PtntCountry by Gradle (app id, name, icons).
-	(cd "$GRADLE_DIR" && TNT_COUNTRY="$COUNTRY" ./gradlew clean "$TASK" -PtntCountry="$COUNTRY")
-else
-	GRADLE_DIR="$ROOT/android"
-	(cd "$GRADLE_DIR" && ./gradlew clean "$TASK" -PtntCountry="$COUNTRY")
-fi
+echo "Building $COUNTRY $VERSION ($MODE, Android)"
+GRADLE_DIR="$ROOT/android"
+(cd "$GRADLE_DIR" && ./gradlew clean "assemble${MODE_CAP}" -PtntCountry="$COUNTRY")
 
-OUT_DIR="app/build/outputs/$SUBDIR/$MODE"
-SRC="$(ls "$GRADLE_DIR/$OUT_DIR"/*."$EXT" 2>/dev/null | head -1 || true)"
+OUT_DIR="app/build/outputs/apk/$MODE"
+SRC="$(ls "$GRADLE_DIR/$OUT_DIR"/*.apk 2>/dev/null | head -1 || true)"
 if [ -z "$SRC" ]; then
-	echo "Build finished but no .$EXT was found in $GRADLE_DIR/$OUT_DIR" >&2
+	echo "Build finished but no .apk was found in $GRADLE_DIR/$OUT_DIR" >&2
 	exit 1
 fi
 
 mkdir -p "$ROOT/dist/mobile"
-DEST="$ROOT/dist/mobile/$COUNTRY-$VERSION-$MODE.$EXT"
+DEST="$ROOT/dist/mobile/$COUNTRY-$VERSION-$MODE.apk"
 cp "$SRC" "$DEST"
 echo "Built: $DEST"
 [ "$OPEN" = 1 ] && open "$(dirname "$DEST")" || true

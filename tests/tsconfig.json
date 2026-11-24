@@ -14,8 +14,7 @@
 		"baseUrl": ".",
 		"paths": {
 			"@server/*": ["../server/*"],
-			"@client/*": ["../client/src/*"],
-			"@app/*": ["../app/src/*"]
+			"@client/*": ["../client/src/*"]
 		}
 	},
 	"include": ["**/*.ts", "../client/src/**/*.tsx", "../client/src/**/*.ts"]

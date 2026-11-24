@@ -7,12 +7,12 @@ plugins {
 }
 
 /**
- * Country selection. Everything country-specific comes from app/countries/<country>/ (shared with the React Native
- * app): config.json (applicationId, appName, apiUrl, colors) and android/res (icons).
+ * Country selection. Everything country-specific comes from mobile/countries/<country>/ (shared with the iOS app):
+ * config.json (applicationId, appName, apiUrl, colors) and android/res (icons).
  * Use ./assemble <release|debug> <country>, which passes -PtntCountry.
  */
 val repoRoot = rootDir.parentFile
-val countriesDir = File(repoRoot, "app/countries")
+val countriesDir = File(repoRoot, "mobile/countries")
 @Suppress("UNCHECKED_CAST")
 fun readJson(file: File) = JsonSlurper().parse(file) as Map<String, Any?>
 
@@ -28,12 +28,12 @@ val countryConfig = readJson(countryConfigFile)
 @Suppress("UNCHECKED_CAST")
 val colors = countryConfig["colors"] as Map<String, String>
 
-// One version for every country: versionCode = major * 10000 + minor * 100 + patch, same rule as the React Native app.
+// One version for every country: versionCode = major * 10000 + minor * 100 + patch, the same number as the iOS build.
 val appVersion = readJson(File(rootDir, "version.json"))["version"] as String
 val (vMajor, vMinor, vPatch) = appVersion.split(".").map { it.toInt() }
 val appVersionCode = vMajor * 10000 + vMinor * 100 + vPatch
 
-// Optional release signing: app/countries/<country>/signing.properties or $TNT_KEYSTORE_DIR/<country>.properties
+// Optional release signing: mobile/countries/<country>/signing.properties or $TNT_KEYSTORE_DIR/<country>.properties
 // (storeFile, storePassword, keyAlias, keyPassword). Neither is committed. Without one, release builds use the
 // debug keystore: every country is distributed as a sideloaded APK signed with it, and updates only install over
 // an APK signed with the same key.
@@ -75,7 +75,7 @@ android {
 
 	signingConfigs {
 		getByName("debug") {
-			storeFile = File(repoRoot, "app/android/app/debug.keystore")
+			storeFile = file("debug.keystore")
 			storePassword = "android"
 			keyAlias = "androiddebugkey"
 			keyPassword = "android"

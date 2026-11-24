@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # Points the iOS project at one country: writes Config/Country.xcconfig and the country's app icon, from the same
-# app/countries/<country>/config.json the Android app uses.
+# mobile/countries/<country>/config.json the Android app uses.
 #
-#   ./configure.sh [country]        (default: the country of app/countries/default.json)
+#   ./configure.sh [country]        (default: the country of mobile/countries/default.json)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
-COUNTRIES="$ROOT/app/countries"
+COUNTRIES="$ROOT/mobile/countries"
 
 COUNTRY="${1:-$(node -p "require('$COUNTRIES/default.json').country")}"
 CONFIG="$COUNTRIES/$COUNTRY/config.json"
