@@ -39,14 +39,14 @@ final class ScanFlowTests: XCTestCase {
 
 	private func scanBox() {
 		app.buttons["simulate-scan"].tap()
-		XCTAssertTrue(app.staticTexts["Box n°test-box"].waitForExistence(timeout: 5))
+		XCTAssertTrue(app.navigationBars["Box n°test-box"].waitForExistence(timeout: 5))
 	}
 
 	func testLoginIsAskedFirstAndKeepsTheButtonOffForAnInvalidNumber() {
 		launch()
 		let button = app.buttons["login-button"]
 		XCTAssertTrue(button.waitForExistence(timeout: 5))
-		XCTAssertTrue(app.staticTexts["Enter your phone number"].exists)
+		XCTAssertTrue(app.navigationBars["Enter your phone number"].exists)
 		// Pre-filled with a valid number.
 		XCTAssertTrue(button.isEnabled)
 
@@ -77,7 +77,7 @@ final class ScanFlowTests: XCTestCase {
 		let toast = app.descendants(matching: .any)["toast"]
 		XCTAssertTrue(toast.waitForExistence(timeout: 5))
 		XCTAssertTrue(toast.label.contains("Success!"))
-		XCTAssertFalse(app.staticTexts["Box n°test-box"].exists)
+		XCTAssertTrue(app.navigationBars["Box n°test-box"].waitForNonExistence(timeout: 5))
 	}
 
 	func testWithoutNetworkTheScanIsSavedOfflineAndListed() {
@@ -90,7 +90,7 @@ final class ScanFlowTests: XCTestCase {
 		XCTAssertTrue(toast.label.contains("Scan saved offline"))
 
 		app.buttons["offline-button"].tap()
-		XCTAssertTrue(app.staticTexts["Offline scans"].waitForExistence(timeout: 5))
+		XCTAssertTrue(app.navigationBars["Offline scans"].waitForExistence(timeout: 5))
 		XCTAssertTrue(app.descendants(matching: .any)["offline-scan-test-box"].exists)
 		// Sending again fails the same way: the scan stays, and the error is explained.
 		app.buttons["send-offline"].tap()
@@ -117,7 +117,7 @@ final class ScanFlowTests: XCTestCase {
 		XCTAssertTrue(app.buttons["retry"].exists)
 		XCTAssertFalse(app.buttons["send"].isEnabled)
 		app.buttons["cancel"].tap()
-		XCTAssertTrue(app.staticTexts["Box n°test-box"].waitForNonExistence(timeout: 5))
+		XCTAssertTrue(app.navigationBars["Box n°test-box"].waitForNonExistence(timeout: 5))
 	}
 
 	func testThePoweredByNoticeIsAlwaysThere() {

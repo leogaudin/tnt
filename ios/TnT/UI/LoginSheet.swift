@@ -15,31 +15,38 @@ struct LoginSheet: View {
 	private var normalized: String? { model.phones.normalize(text) }
 
 	var body: some View {
-		VStack(spacing: 15) {
-			SheetTitle(Strings.enterPhoneNumber)
-			HStack {
-				Text(flag(model.phones.region(text))).font(.system(size: 28)).frame(minWidth: 48)
-				TextField("", text: $text)
-					.keyboardType(.phonePad)
-					.textContentType(.telephoneNumber)
-					.font(.system(size: 20))
-					.accessibilityIdentifier("phone-field")
-					.onChange(of: text) { _, new in
-						let formatted = model.phones.format(new)
-						if formatted != new { text = formatted }
+		NavigationStack {
+			Form {
+				Section {
+					HStack(spacing: 12) {
+						Text(flag(model.phones.region(text))).font(.title)
+						TextField("", text: $text)
+							.keyboardType(.phonePad)
+							.textContentType(.telephoneNumber)
+							.font(.title3)
+							.accessibilityIdentifier("phone-field")
+							.onChange(of: text) { _, new in
+								let formatted = model.phones.format(new)
+								if formatted != new { text = formatted }
+							}
 					}
+				}
+				Section {
+					Button { if let number = normalized { model.setLogin(number) } } label: {
+						Text(Strings.login).frame(maxWidth: .infinity).foregroundStyle(Theme.onTint)
+					}
+					.buttonStyle(.borderedProminent)
+					.controlSize(.large)
+					.disabled(normalized == nil)
+					.accessibilityIdentifier("login-button")
+					.listRowInsets(EdgeInsets())
+					.listRowBackground(Color.clear)
+				}
 			}
-			Button { if let number = normalized { model.setLogin(number) } } label: {
-				Text(Strings.login).frame(maxWidth: .infinity)
-			}
-			.buttonStyle(.borderedProminent)
-			.controlSize(.large)
-			.tint(Theme.main)
-			.disabled(normalized == nil)
-			.accessibilityIdentifier("login-button")
+			.navigationTitle(Strings.enterPhoneNumber)
+			.navigationBarTitleDisplayMode(.inline)
 		}
-		.padding(20)
-		.frame(maxHeight: .infinity, alignment: .top)
+		.tint(Theme.tint)
 		.presentationDetents([.medium])
 		.interactiveDismissDisabled()
 	}
@@ -47,17 +54,5 @@ struct LoginSheet: View {
 	private func flag(_ region: String?) -> String {
 		guard let region, region.count == 2 else { return "🌐" }
 		return String(region.unicodeScalars.compactMap { UnicodeScalar(127_397 + $0.value) }.map(Character.init))
-	}
-}
-
-struct SheetTitle: View {
-	let text: String
-	init(_ text: String) { self.text = text }
-
-	var body: some View {
-		Text(text)
-			.font(.system(size: 25, weight: .bold))
-			.multilineTextAlignment(.center)
-			.padding(.top, 10)
 	}
 }

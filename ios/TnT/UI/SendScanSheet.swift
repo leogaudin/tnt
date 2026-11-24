@@ -13,54 +13,55 @@ struct SendScanSheet: View {
 	@State private var cancelSearch: Cancel?
 
 	var body: some View {
-		ScrollView {
-			VStack(spacing: 15) {
-				SheetTitle(Strings.boxTitle(boxId))
-				VStack(spacing: 4) {
-					Text(Strings.location).bold()
-					Text(locationText).multilineTextAlignment(.center).accessibilityIdentifier("location-text")
-					if failure != nil {
-						Button(Strings.retry) { locate() }.accessibilityIdentifier("retry")
-					}
-				}
-				.padding(.vertical, 5)
-				TextField(Strings.addComment, text: $comment, axis: .vertical)
-					.padding(12)
-					.background(RoundedRectangle(cornerRadius: 4).stroke(Theme.main))
-					.onChange(of: comment) { _, new in
-						if new.count > Self.maxComment { comment = String(new.prefix(Self.maxComment)) }
-					}
-					.accessibilityIdentifier("comment")
-				Button { received.toggle() } label: {
+		NavigationStack {
+			Form {
+				Section(Strings.location) {
 					HStack {
-						Image(systemName: received ? "checkmark.square.fill" : "square").foregroundStyle(Theme.main)
-						Text(Strings.markAsReceived).foregroundStyle(.primary)
-						Spacer()
+						if location == nil && failure == nil { ProgressView() }
+						Text(locationText)
+							.foregroundStyle(failure == nil ? Color.primary : Color.secondary)
+							.accessibilityIdentifier("location-text")
+						if failure != nil {
+							Spacer()
+							Button(Strings.retry) { locate() }
+								.buttonStyle(.borderless)
+								.accessibilityIdentifier("retry")
+						}
 					}
 				}
-				.buttonStyle(.plain)
-				.accessibilityIdentifier("received")
-				HStack(spacing: 10) {
-					Button(Strings.cancel) { close() }
-						.buttonStyle(.bordered)
-						.accessibilityIdentifier("cancel")
+				Section {
+					TextField(Strings.addComment, text: $comment, axis: .vertical)
+						.lineLimit(1...4)
+						.onChange(of: comment) { _, new in
+							if new.count > Self.maxComment { comment = String(new.prefix(Self.maxComment)) }
+						}
+						.accessibilityIdentifier("comment")
+					Toggle(Strings.markAsReceived, isOn: $received)
+						.accessibilityIdentifier("received")
+				}
+			}
+			.navigationTitle(Strings.boxTitle(boxId))
+			.navigationBarTitleDisplayMode(.inline)
+			.toolbar {
+				ToolbarItem(placement: .cancellationAction) {
+					Button(Strings.cancel) { close() }.accessibilityIdentifier("cancel")
+				}
+				ToolbarItem(placement: .confirmationAction) {
 					Button(Strings.send) { send() }
-						.buttonStyle(.borderedProminent)
+						.bold()
 						.disabled(location == nil)
 						.accessibilityIdentifier("send")
 				}
-				.controlSize(.large)
-				.tint(Theme.main)
 			}
-			.padding(20)
 		}
+		.tint(Theme.tint)
 		.presentationDetents([.medium, .large])
 		.onAppear { locate() }
 		.onDisappear { cancelSearch?() }
 	}
 
 	private var locationText: String {
-		if let location { return "(\(location.latitude), \(location.longitude))" }
+		if let location { return "(\(Coordinates.format(location.latitude)), \(Coordinates.format(location.longitude)))" }
 		return failure?.message ?? Strings.determining
 	}
 
@@ -94,5 +95,13 @@ struct SendScanSheet: View {
 	private func close() {
 		cancelSearch?()
 		model.sendTarget = nil
+	}
+}
+
+/// How a position is shown: the same everywhere whatever the phone's language, with no more digits than are meaningful.
+/// Display only: what is sent keeps its full precision.
+enum Coordinates {
+	static func format(_ value: Double) -> String {
+		value.formatted(.number.locale(Locale(identifier: "en_US_POSIX")).grouping(.never).precision(.fractionLength(0...5)))
 	}
 }

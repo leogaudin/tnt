@@ -12,9 +12,8 @@ struct ScannerScreen: View {
 			if camera.isAvailable {
 				CameraPreview(session: camera.session).ignoresSafeArea()
 			} else {
-				Color.white.ignoresSafeArea()
+				Color(.systemBackground).ignoresSafeArea()
 				Text(Strings.noCamera)
-					.font(.system(size: 16))
 					.multilineTextAlignment(.center)
 					.padding(20)
 			}
@@ -39,8 +38,9 @@ struct ScannerScreen: View {
 			RoundButton(icon: "icloud.slash", label: Strings.offlineScans, id: "offline-button") { model.showOffline = true }
 			Spacer()
 			if let code = model.simulatedCode {
-				Button("Simulate scan") { model.onCode(code) }
+				Button { model.onCode(code) } label: { Text("Simulate scan").foregroundStyle(Theme.onTint) }
 					.buttonStyle(.borderedProminent)
+					.tint(Theme.tint)
 					.accessibilityIdentifier("simulate-scan")
 			}
 			Spacer()
@@ -59,7 +59,7 @@ struct ScannerScreen: View {
 	private var poweredBy: some View {
 		Link(Strings.poweredBy, destination: URL(string: Strings.poweredByURL)!)
 			.font(.system(size: 12))
-			.foregroundStyle(camera.isAvailable ? .white : .black)
+			.foregroundStyle(camera.isAvailable ? Color.white : Color.primary)
 			.shadow(color: .black, radius: 4)
 			.padding(12)
 	}
@@ -76,8 +76,9 @@ private struct RoundButton: View {
 			Image(systemName: icon)
 				.font(.system(size: 18))
 				.foregroundStyle(.white)
-				.frame(width: 42, height: 42)
-				.background(Circle().fill(Color(white: 0.94).opacity(0.47)))
+				.frame(width: 44, height: 44)
+				.background(.ultraThinMaterial, in: Circle())
+				.environment(\.colorScheme, .dark)
 		}
 		.accessibilityLabel(label)
 		.accessibilityIdentifier(id)

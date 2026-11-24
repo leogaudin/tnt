@@ -5,17 +5,23 @@ struct PermissionsScreen: View {
 	let model: AppModel
 
 	var body: some View {
-		VStack(spacing: 15) {
+		VStack(spacing: 20) {
+			Image(systemName: "camera.viewfinder")
+				.font(.system(size: 56))
+				.foregroundStyle(.secondary)
 			Text(Strings.permissionsNeeded)
-				.font(.system(size: 20))
+				.font(.title3)
 				.multilineTextAlignment(.center)
-			Button(Strings.checkPermissionsAgain) { model.permissionsButton() }
+			Button { model.permissionsButton() } label: {
+				Text(Strings.checkPermissionsAgain).foregroundStyle(Theme.onTint)
+			}
 				.buttonStyle(.borderedProminent)
-				.tint(Theme.main)
+				.controlSize(.large)
+				.tint(Theme.tint)
 				.accessibilityIdentifier("check-permissions")
 		}
 		.padding(30)
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
-		.background(Color(white: 0.96))
+		.background(Color(.systemGroupedBackground))
 	}
 }

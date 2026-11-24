@@ -8,16 +8,16 @@ struct ToastOverlay: View {
 		VStack {
 			if let toast {
 				VStack(spacing: 2) {
-					Text(toast.title).font(.system(size: 15, weight: .bold))
-					Text(toast.text).font(.system(size: 14))
+					Text(toast.title).font(.subheadline.bold())
+					Text(toast.text).font(.footnote).foregroundStyle(.secondary)
 				}
 				.multilineTextAlignment(.center)
-				.foregroundStyle(.white)
-				.padding(.horizontal, 16)
-				.padding(.vertical, 10)
-				.background(RoundedRectangle(cornerRadius: 12).fill(Color.black.opacity(0.85)))
 				.padding(.horizontal, 20)
-				.padding(.top, 60)
+				.padding(.vertical, 12)
+				.background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
+				.shadow(color: .black.opacity(0.15), radius: 8, y: 2)
+				.padding(.horizontal, 20)
+				.padding(.top, 8)
 				.transition(.move(edge: .top).combined(with: .opacity))
 				.accessibilityElement(children: .combine)
 				.accessibilityIdentifier("toast")
