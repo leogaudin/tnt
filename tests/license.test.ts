@@ -48,6 +48,12 @@ describe('attribution notice in the native iOS scanner', () => {
 		expect(src).toContain(NOTICE);
 		expect(src).toContain(URL);
 	});
+
+	it('the scanner screen displays the notice and opens the link', () => {
+		const src = read('ios/TnT/UI/ScannerScreen.swift');
+		expect(src).toContain('Strings.poweredBy');
+		expect(src).toContain('Strings.poweredByURL');
+	});
 });
 
 describe('declared package licenses match LICENSE', () => {
