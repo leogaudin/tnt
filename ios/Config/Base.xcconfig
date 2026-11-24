@@ -1,0 +1,15 @@
+// Settings shared by every country. Country.xcconfig is written by configure.sh from app/countries/<country>/config.json
+// and overrides the defaults below (those are the _default country).
+TNT_BUNDLE_ID = com.tnt.scanner
+TNT_APP_NAME = Track-and-Trace
+TNT_API_URL = http:/$()/localhost:3000/api
+TNT_COLOR_LIGHTEST = F0F5FF
+TNT_COLOR_LIGHT = EBF0FE
+TNT_COLOR_MAIN = 0949FF
+TNT_COLOR_DARK = 0033C0
+TNT_COLOR_DARKEST = 001D6A
+TNT_APP_ICON = AppIcon
+TNT_VERSION = 2.0.0
+TNT_BUILD = 20000
+
+#include? "Country.xcconfig"

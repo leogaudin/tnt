@@ -40,6 +40,16 @@ describe('attribution notice in the native Android scanner', () => {
 	});
 });
 
+describe('attribution notice in the native iOS scanner', () => {
+	const strings = 'ios/TnT/UI/Strings.swift';
+
+	it('shows the notice and links to the upstream repository', () => {
+		const src = read(strings);
+		expect(src).toContain(NOTICE);
+		expect(src).toContain(URL);
+	});
+});
+
 describe('declared package licenses match LICENSE', () => {
 	it.each(['server', 'client', 'app'])('%s/package.json', (pkg) => {
 		expect(JSON.parse(read(`${pkg}/package.json`)).license).toBe('AGPL-3.0-only');

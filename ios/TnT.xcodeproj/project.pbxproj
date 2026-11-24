@@ -1,0 +1,500 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		B00000000000000000000001 /* Assets.xcassets (generated) in Resources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000006 /* Assets.xcassets */; };
+		B00000000000000000000002 /* PhoneNumberKit in Frameworks */ = {isa = PBXBuildFile; productRef = D00000000000000000000001 /* PhoneNumberKit */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C00000000000000000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A00000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 700000000000000000000001;
+			remoteInfo = TnT;
+		};
+		C00000000000000000000002 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A00000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 700000000000000000000001;
+			remoteInfo = TnT;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		F00000000000000000000001 /* TnT.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TnT.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F00000000000000000000002 /* TnTTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TnTTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		F00000000000000000000003 /* TnTUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TnTUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		F00000000000000000000004 /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
+		F00000000000000000000005 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F00000000000000000000006 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		E00000000000000000000001 /* TnT */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = TnT;
+			sourceTree = "<group>";
+		};
+		E00000000000000000000002 /* TnTTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = TnTTests;
+			sourceTree = "<group>";
+		};
+		E00000000000000000000003 /* TnTUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = TnTUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		P00000000000000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B00000000000000000000002 /* PhoneNumberKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		P00000000000000000000002 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		P00000000000000000000003 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		G00000000000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				G00000000000000000000003 /* Config */,
+				E00000000000000000000001 /* TnT */,
+				E00000000000000000000002 /* TnTTests */,
+				E00000000000000000000003 /* TnTUITests */,
+				G00000000000000000000002 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		G00000000000000000000002 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F00000000000000000000001 /* TnT.app */,
+				F00000000000000000000002 /* TnTTests.xctest */,
+				F00000000000000000000003 /* TnTUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		G00000000000000000000003 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				F00000000000000000000004 /* Base.xcconfig */,
+				F00000000000000000000005 /* Info.plist */,
+				G00000000000000000000004 /* Generated */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+		G00000000000000000000004 /* Generated */ = {
+			isa = PBXGroup;
+			children = (
+				F00000000000000000000006 /* Assets.xcassets */,
+			);
+			path = Generated;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		700000000000000000000001 /* TnT */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = L00000000000000000000002 /* Build configuration list for PBXNativeTarget "TnT" */;
+			buildPhases = (
+				Q00000000000000000000001 /* Sources */,
+				P00000000000000000000001 /* Frameworks */,
+				R00000000000000000000001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				E00000000000000000000001 /* TnT */,
+			);
+			name = TnT;
+			packageProductDependencies = (
+				D00000000000000000000001 /* PhoneNumberKit */,
+			);
+			productName = TnT;
+			productReference = F00000000000000000000001 /* TnT.app */;
+			productType = "com.apple.product-type.application";
+		};
+		700000000000000000000002 /* TnTTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = L00000000000000000000003 /* Build configuration list for PBXNativeTarget "TnTTests" */;
+			buildPhases = (
+				Q00000000000000000000002 /* Sources */,
+				P00000000000000000000002 /* Frameworks */,
+				R00000000000000000000002 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				T00000000000000000000001 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				E00000000000000000000002 /* TnTTests */,
+			);
+			name = TnTTests;
+			packageProductDependencies = (
+			);
+			productName = TnTTests;
+			productReference = F00000000000000000000002 /* TnTTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		700000000000000000000003 /* TnTUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = L00000000000000000000004 /* Build configuration list for PBXNativeTarget "TnTUITests" */;
+			buildPhases = (
+				Q00000000000000000000003 /* Sources */,
+				P00000000000000000000003 /* Frameworks */,
+				R00000000000000000000003 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				T00000000000000000000002 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				E00000000000000000000003 /* TnTUITests */,
+			);
+			name = TnTUITests;
+			packageProductDependencies = (
+			);
+			productName = TnTUITests;
+			productReference = F00000000000000000000003 /* TnTUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A00000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2720;
+				LastUpgradeCheck = 2720;
+				TargetAttributes = {
+					700000000000000000000001 = {
+						CreatedOnToolsVersion = 27.2;
+					};
+					700000000000000000000002 = {
+						CreatedOnToolsVersion = 27.2;
+						TestTargetID = 700000000000000000000001;
+					};
+					700000000000000000000003 = {
+						CreatedOnToolsVersion = 27.2;
+						TestTargetID = 700000000000000000000001;
+					};
+				};
+			};
+			buildConfigurationList = L00000000000000000000001 /* Build configuration list for PBXProject "TnT" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = G00000000000000000000001;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				K00000000000000000000001 /* XCRemoteSwiftPackageReference "PhoneNumberKit" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = G00000000000000000000002 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				700000000000000000000001 /* TnT */,
+				700000000000000000000002 /* TnTTests */,
+				700000000000000000000003 /* TnTUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		R00000000000000000000001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B00000000000000000000001 /* Assets.xcassets (generated) in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		R00000000000000000000002 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		R00000000000000000000003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		Q00000000000000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		Q00000000000000000000002 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		Q00000000000000000000003 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		T00000000000000000000001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 700000000000000000000001 /* TnT */;
+			targetProxy = C00000000000000000000001 /* PBXContainerItemProxy */;
+		};
+		T00000000000000000000002 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 700000000000000000000001 /* TnT */;
+			targetProxy = C00000000000000000000002 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		X00000000000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F00000000000000000000004 /* Base.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		X00000000000000000000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F00000000000000000000004 /* Base.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		X00000000000000000000003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "$(TNT_APP_ICON)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = "$(TNT_BUILD)";
+				DEVELOPMENT_TEAM = R32B9PWM4R;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Config/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = "$(TNT_VERSION)";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(TNT_BUNDLE_ID)";
+				PRODUCT_NAME = TnT;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		X00000000000000000000004 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "$(TNT_APP_ICON)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = "$(TNT_BUILD)";
+				DEVELOPMENT_TEAM = R32B9PWM4R;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Config/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = "$(TNT_VERSION)";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(TNT_BUNDLE_ID)";
+				PRODUCT_NAME = TnT;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		X00000000000000000000005 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = R32B9PWM4R;
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tnt.scanner.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TnT.app/TnT";
+			};
+			name = Debug;
+		};
+		X00000000000000000000006 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = R32B9PWM4R;
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tnt.scanner.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TnT.app/TnT";
+			};
+			name = Release;
+		};
+		X00000000000000000000007 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = R32B9PWM4R;
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tnt.scanner.uitests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = TnT;
+			};
+			name = Debug;
+		};
+		X00000000000000000000008 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = R32B9PWM4R;
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tnt.scanner.uitests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = TnT;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		L00000000000000000000001 /* Build configuration list for PBXProject "TnT" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				X00000000000000000000001 /* Debug */,
+				X00000000000000000000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		L00000000000000000000002 /* Build configuration list for PBXNativeTarget "TnT" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				X00000000000000000000003 /* Debug */,
+				X00000000000000000000004 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		L00000000000000000000003 /* Build configuration list for PBXNativeTarget "TnTTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				X00000000000000000000005 /* Debug */,
+				X00000000000000000000006 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		L00000000000000000000004 /* Build configuration list for PBXNativeTarget "TnTUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				X00000000000000000000007 /* Debug */,
+				X00000000000000000000008 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		K00000000000000000000001 /* XCRemoteSwiftPackageReference "PhoneNumberKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/marmelroy/PhoneNumberKit";
+			requirement = {
+				kind = exactVersion;
+				version = 4.3.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		D00000000000000000000001 /* PhoneNumberKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = K00000000000000000000001 /* XCRemoteSwiftPackageReference "PhoneNumberKit" */;
+			productName = PhoneNumberKit;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = A00000000000000000000001 /* Project object */;
+}

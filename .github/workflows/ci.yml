@@ -57,6 +57,22 @@ jobs:
       - run: ./gradlew testDebugUnitTest lintDebug assembleDebug -PtntCountry=_default
         working-directory: android
 
+  ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+      - run: ./configure.sh _default
+        working-directory: ios
+      # The simulator name is read from the runner rather than hard-coded: images change which iPhones they have.
+      - run: |
+          DEVICE="$(xcrun simctl list devices available | grep -m1 -oE 'iPhone [^(]+' | sed 's/ *$//')"
+          xcodebuild test -project TnT.xcodeproj -scheme TnT -only-testing:TnTTests \
+            -destination "platform=iOS Simulator,name=$DEVICE" CODE_SIGNING_ALLOWED=NO
+        working-directory: ios
+
   unit-tests:
     runs-on: ubuntu-latest
     steps:
