@@ -32,7 +32,7 @@
 				android:layout_width="42dp"
 				android:layout_height="42dp"
 				android:background="@drawable/bg_round_button"
-				android:contentDescription="@string/offline_list"
+				android:contentDescription="@string/offline_scans"
 				android:src="@drawable/ic_offline" />
 
 			<View

@@ -1,15 +1,17 @@
 package com.tnt.scanner.location
 
+import androidx.annotation.StringRes
+import com.tnt.scanner.R
 import com.tnt.scanner.data.ScanLocation
 
 enum class Provider { NETWORK, GPS }
 
-/** Why no position could be had. [message] says what the user can do about it. */
-enum class LocationFailure(val message: String) {
-	DENIED("Location access is denied. Allow it for this app in the phone settings."),
-	UNAVAILABLE("Location is unavailable. Turn on location in the phone settings."),
-	TIMEOUT("The location search timed out. Move to an open area and retry."),
-	OTHER("Location could not be determined."),
+/** Why no position could be had. [message] (a string resource) says what the user can do about it. */
+enum class LocationFailure(@StringRes val message: Int) {
+	DENIED(R.string.location_denied),
+	UNAVAILABLE(R.string.location_unavailable),
+	TIMEOUT(R.string.location_timeout),
+	OTHER(R.string.location_other),
 }
 
 sealed class LocationResult {

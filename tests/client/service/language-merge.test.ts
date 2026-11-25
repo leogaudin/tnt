@@ -28,3 +28,14 @@ describe('mergeResources', () => {
 		expect(Object.keys(fr).sort()).toEqual(Object.keys(en).sort());
 	});
 });
+
+describe('Liberia labels', () => {
+	it('say principal where the base locale says HT, and only there', async () => {
+		const { default: liberia } = await import('@client/../countries/liberia/config');
+		const out = mergeResources({ en, fr }, {}, liberia.labels);
+		expect(out.en.htName).toBe('Principal Name');
+		expect(out.en.htPhone).toBe('Principal Phone');
+		expect(en.htName).toBe('HT Name');
+		expect(out.en.school).toBe('School Name');
+	});
+});

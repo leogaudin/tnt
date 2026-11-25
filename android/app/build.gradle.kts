@@ -28,6 +28,29 @@ val countryConfig = readJson(countryConfigFile)
 @Suppress("UNCHECKED_CAST")
 val colors = countryConfig["colors"] as Map<String, String>
 
+// Texts: mobile/strings/<language>.json (shared with iOS) for the country's language, English where a text is missing,
+// then the country's own `strings` overrides. Written as the app's only string resources, so the app is always in the
+// country's language whatever the phone's.
+val appLanguage = (countryConfig["language"] as String?) ?: "en"
+@Suppress("UNCHECKED_CAST")
+val texts = (readJson(File(repoRoot, "mobile/strings/en.json")) as Map<String, String>) +
+	(if (appLanguage == "en") emptyMap() else readJson(File(repoRoot, "mobile/strings/$appLanguage.json")) as Map<String, String>) +
+	((countryConfig["strings"] as Map<String, String>?) ?: emptyMap())
+val generatedResDir = layout.buildDirectory.dir("generated/tnt/res")
+val generateTexts by tasks.registering {
+	inputs.property("texts", texts)
+	outputs.dir(generatedResDir)
+	doLast {
+		val xml = texts.entries.joinToString("\n", "<resources>\n", "\n</resources>\n") { (key, text) ->
+			val name = key.replace(Regex("([A-Z])")) { "_" + it.value.lowercase() }
+			val value = text.replace("{id}", "%1\$s")
+				.replace("&", "&amp;").replace("<", "&lt;").replace("'", "\\'").replace("\"", "\\\"")
+			"\t<string name=\"$name\">$value</string>"
+		}
+		generatedResDir.get().asFile.resolve("values").also { it.mkdirs() }.resolve("tnt_strings.xml").writeText(xml)
+	}
+}
+
 // One version for every country: versionCode = major * 10000 + minor * 100 + patch, the same number as the iOS build.
 val appVersion = readJson(File(rootDir, "version.json"))["version"] as String
 val (vMajor, vMinor, vPatch) = appVersion.split(".").map { it.toInt() }
@@ -62,8 +85,8 @@ android {
 		resValue("string", "app_name", countryConfig["appName"] as String)
 		buildConfigField("String", "API_URL", "\"${countryConfig["apiUrl"]}\"")
 		colors.forEach { (name, value) -> resValue("color", "tnt_$name", value) }
-		// Only the language the app is written in: keeps the AppCompat/Material translations out of the APK.
-		resourceConfigurations += listOf("en")
+		// Only the language the country is written in: keeps the AppCompat/Material translations out of the APK.
+		resourceConfigurations += listOf(appLanguage)
 	}
 
 	buildFeatures {
@@ -71,7 +94,8 @@ android {
 		buildConfig = true
 	}
 
-	sourceSets["main"].res.srcDir(countryResDir)
+	sourceSets["main"].res.srcDirs(countryResDir)
+	sourceSets["main"].res.srcDir(generatedResDir)
 
 	signingConfigs {
 		getByName("debug") {
@@ -115,6 +139,9 @@ android {
 		resources.excludes += listOf("META-INF/*.version", "META-INF/com/android/build/gradle/*", "DebugProbesKt.bin", "kotlin-tooling-metadata.json")
 	}
 }
+
+// Before anything reads the resources (merge, lint, tests), even after a clean.
+tasks.named("preBuild") { dependsOn(generateTexts) }
 
 kotlin {
 	jvmToolchain(17)

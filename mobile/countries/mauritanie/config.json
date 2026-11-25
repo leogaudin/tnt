@@ -2,6 +2,7 @@
 	"applicationId": "com.tntmauritanie.scanner",
 	"appName": "Track-and-Trace",
 	"apiUrl": "https://tnt-mauritanie-api.vercel.app/api",
+	"language": "fr",
 	"colors": {
 		"lightest": "#FFF0ED",
 		"light": "#F79F97",

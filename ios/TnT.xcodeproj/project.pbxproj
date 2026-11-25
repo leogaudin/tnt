@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B00000000000000000000011 /* en.json in Resources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000011 /* en.json */; };
+		B00000000000000000000012 /* fr.json in Resources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000012 /* fr.json */; };
 		B00000000000000000000001 /* Assets.xcassets (generated) in Resources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000006 /* Assets.xcassets */; };
 		B00000000000000000000002 /* PhoneNumberKit in Frameworks */ = {isa = PBXBuildFile; productRef = D00000000000000000000001 /* PhoneNumberKit */; };
 /* End PBXBuildFile section */
@@ -29,6 +31,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		F00000000000000000000011 /* en.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = en.json; path = ../mobile/strings/en.json; sourceTree = SOURCE_ROOT; };
+		F00000000000000000000012 /* fr.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = fr.json; path = ../mobile/strings/fr.json; sourceTree = SOURCE_ROOT; };
 		F00000000000000000000001 /* TnT.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TnT.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F00000000000000000000002 /* TnTTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TnTTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F00000000000000000000003 /* TnTUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TnTUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -108,6 +112,8 @@
 				F00000000000000000000004 /* Base.xcconfig */,
 				F00000000000000000000005 /* Info.plist */,
 				G00000000000000000000004 /* Generated */,
+				F00000000000000000000011 /* en.json */,
+				F00000000000000000000012 /* fr.json */,
 			);
 			path = Config;
 			sourceTree = "<group>";
@@ -245,6 +251,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				B00000000000000000000001 /* Assets.xcassets (generated) in Resources */,
+				B00000000000000000000011 /* en.json in Resources */,
+				B00000000000000000000012 /* fr.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

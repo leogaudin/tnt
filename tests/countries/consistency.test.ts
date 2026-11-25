@@ -15,6 +15,9 @@ const appCfg = import.meta.glob('../../mobile/countries/*/config.json', { eager:
 const localeFiles = import.meta.glob('../../client/countries/*/locales/*.json', { eager: true, import: 'default' }) as Record<string, any>;
 const baseLocales = import.meta.glob('../../client/src/language/locales/*.json', { eager: true, import: 'default' }) as Record<string, Record<string, string>>;
 
+const appTexts = import.meta.glob('../../mobile/strings/*.json', { eager: true, import: 'default' }) as Record<string, Record<string, string>>;
+const appLanguages = Object.fromEntries(Object.entries(appTexts).map(([f, v]) => [path.basename(f, '.json'), v]));
+
 const byCountry = (files: Record<string, any>) =>
 	Object.fromEntries(Object.entries(files).map(([f, v]) => [f.split('/countries/')[1].split('/')[0], v]));
 const client = byCountry(clientCfg);
@@ -140,6 +143,28 @@ describe.each(countries)('country %s', (c) => {
 		}
 		expect(app[c].applicationId).toMatch(/^[a-z][a-z0-9]*(\.[a-z][a-z0-9_]*)+$/);
 		expect(app[c].appName.length).toBeGreaterThan(0);
+	});
+
+	it('app is written in a language it has texts for, and overrides only texts that exist', () => {
+		const language = app[c].language ?? 'en';
+		expect(Object.keys(appLanguages), 'language').toContain(language);
+		for (const key of Object.keys(app[c].strings ?? {})) expect(appLanguages.en, `override ${key}`).toHaveProperty(key);
+		// A country's dashboard and app speak the same language.
+		expect(client[c].languages, 'dashboard languages').toContain(language);
+		if (language !== 'en') expect(client[c].defaultLanguage).toBe(language);
+	});
+});
+
+describe('mobile texts', () => {
+	it('every language has exactly the keys of English, filled in', () => {
+		for (const [language, texts] of Object.entries(appLanguages)) {
+			expect(Object.keys(texts).sort(), language).toEqual(Object.keys(appLanguages.en).sort());
+			for (const [key, text] of Object.entries(texts)) expect(text.trim(), `${language}.${key}`).not.toBe('');
+		}
+	});
+
+	it('the box title keeps its {id} in every language', () => {
+		for (const texts of Object.values(appLanguages)) expect(texts.boxTitle).toContain('{id}');
 	});
 });
 

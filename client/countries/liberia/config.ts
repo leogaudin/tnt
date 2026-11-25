@@ -35,6 +35,9 @@ export default {
 			school: 'School Name',
 			schoolType: 'School Type',
 			schoolSession: 'School Session',
+			// Nobody in Liberia knows what a "headteacher" is.
+			htName: 'Principal Name',
+			htPhone: 'Principal Phone',
 		},
 		fr: {
 			county: 'Comté',

@@ -53,6 +53,10 @@
 	</array>
 	<key>TntApiUrl</key>
 	<string>$(TNT_API_URL)</string>
+	<key>TntLanguage</key>
+	<string>$(TNT_LANGUAGE)</string>
+	<key>TntStringOverrides</key>
+	<string>$(TNT_STRING_OVERRIDES)</string>
 	<key>TntColors</key>
 	<dict>
 		<key>lightest</key>

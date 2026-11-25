@@ -66,9 +66,9 @@ class SendScanDialog(
 					binding.send.isEnabled = true
 				}
 				is LocationResult.Failure -> {
-					binding.location.text = result.reason.message
+					binding.location.text = activity.getString(result.reason.message)
 					binding.retry.visibility = View.VISIBLE
-					Toasts.show(activity, activity.getString(R.string.toast_location), result.reason.message)
+					Toasts.show(activity, activity.getString(R.string.toast_location), activity.getString(result.reason.message))
 				}
 			}
 		}

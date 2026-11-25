@@ -173,12 +173,4 @@ class LocatorTest {
 		assertNull(result)
 		assertEquals(listOf(Provider.NETWORK), source.requested)
 	}
-
-	@Test
-	fun `messages are the ones of the React Native app`() {
-		assertEquals("Location access is denied. Allow it for this app in the phone settings.", LocationFailure.DENIED.message)
-		assertEquals("Location is unavailable. Turn on location in the phone settings.", LocationFailure.UNAVAILABLE.message)
-		assertEquals("The location search timed out. Move to an open area and retry.", LocationFailure.TIMEOUT.message)
-		assertEquals("Location could not be determined.", LocationFailure.OTHER.message)
-	}
 }

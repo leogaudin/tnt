@@ -2,6 +2,7 @@
 	"applicationId": "com.tntsenegal.scanner",
 	"appName": "Track-and-Trace",
 	"apiUrl": "https://tnt-senegal-api.vercel.app/api",
+	"language": "fr",
 	"colors": {
 		"lightest": "#B1C4B7",
 		"light": "#76B88C",

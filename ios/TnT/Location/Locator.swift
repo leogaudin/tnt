@@ -17,10 +17,10 @@ enum LocationFailure: Equatable, Sendable {
 
 	var message: String {
 		switch self {
-		case .denied: "Location access is denied. Allow it for this app in the phone settings."
-		case .unavailable: "Location is unavailable. Turn on location in the phone settings."
-		case .timeout: "The location search timed out. Move to an open area and retry."
-		case .other: "Location could not be determined."
+		case .denied: Strings.locationDenied
+		case .unavailable: Strings.locationUnavailable
+		case .timeout: Strings.locationTimeout
+		case .other: Strings.locationOther
 		}
 	}
 }

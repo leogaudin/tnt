@@ -1,31 +1,6 @@
 <resources>
-	<string name="permissions_needed">This application needs access to the camera and location to launch. Please allow access to both and restart.</string>
-	<string name="check_permissions_again">Check permissions again</string>
-	<string name="enter_phone_number">Enter your phone number</string>
-	<string name="login">Login</string>
-	<string name="no_camera">No camera was found on this device, so boxes cannot be scanned.</string>
+	<!-- Every other text is generated from mobile/strings by build.gradle.kts (language and overrides of the country). -->
 	<!-- Attribution notice required by the additional terms in LICENSE (AGPL-3.0 section 7(b)). Do not remove or hide. -->
 	<string name="powered_by">Powered by TnT (Track-and-Trace)</string>
 	<string name="powered_by_url" translatable="false">https://github.com/leogaudin/tnt</string>
-	<string name="box_title">Box n°%1$s</string>
-	<string name="location">Location</string>
-	<string name="determining">Determining...</string>
-	<string name="retry">Retry</string>
-	<string name="add_comment">Add a comment...</string>
-	<string name="mark_as_received">Mark as received (HT only)</string>
-	<string name="cancel">Cancel</string>
-	<string name="send">Send</string>
-	<string name="offline_scans">Offline scans</string>
-	<string name="no_offline_scans">No offline scans</string>
-	<string name="send_offline_scans">Send offline scans</string>
-	<string name="close">Close</string>
-	<string name="toast_success">Success!</string>
-	<string name="toast_success_text">Scan sent successfully</string>
-	<string name="toast_saved_offline">Scan saved offline</string>
-	<string name="toast_saved_offline_text">Send it later from the offline scans list</string>
-	<string name="toast_offline_error">Error sending offline data</string>
-	<string name="toast_offline_error_text">Offline data will be sent when connection is restored</string>
-	<string name="toast_location">Location</string>
-	<string name="flashlight">Flashlight</string>
-	<string name="offline_list">Offline scans</string>
 </resources>

@@ -20,6 +20,9 @@ field() { node -p "require('$CONFIG').$1"; }
 VERSION="$(node -p "require('$ROOT/android/version.json').version")"
 # Same number as the Android versionCode: major * 10000 + minor * 100 + patch.
 BUILD="$(node -p "const [a,b,c]='$VERSION'.split('.').map(Number); a*10000+b*100+c")"
+# Every country is written in one language (default English), with optional text overrides of that language.
+LANGUAGE="$(node -p "require('$CONFIG').language || 'en'")"
+OVERRIDES="$(node -p "JSON.stringify(require('$CONFIG').strings || {})")"
 color() { field "colors.$1" | tr -d '#'; }
 
 cat > "$HERE/Config/Country.xcconfig" <<XCCONFIG
@@ -28,6 +31,9 @@ TNT_BUNDLE_ID = $(field applicationId)
 TNT_APP_NAME = $(field appName)
 // "//" starts a comment in an xcconfig, so the one of the scheme is spelled around it.
 TNT_API_URL = $(field apiUrl | sed 's#//#/$()/#')
+TNT_LANGUAGE = $LANGUAGE
+// JSON; "//" would start an xcconfig comment, so it is spelled around it like the API URL.
+TNT_STRING_OVERRIDES = $(echo "$OVERRIDES" | sed 's#//#/$()/#g')
 TNT_COLOR_LIGHTEST = $(color lightest)
 TNT_COLOR_LIGHT = $(color light)
 TNT_COLOR_MAIN = $(color main)

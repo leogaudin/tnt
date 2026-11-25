@@ -2,6 +2,9 @@
 	"applicationId": "com.tntliberia.scanner",
 	"appName": "TnT Liberia",
 	"apiUrl": "https://tnt-liberia-api.vercel.app/api",
+	"strings": {
+		"markAsReceived": "Mark as received (Principal only)"
+	},
 	"colors": {
 		"lightest": "#E7EBF2",
 		"light": "#A9B4CC",
